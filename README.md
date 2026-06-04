@@ -1,4 +1,25 @@
+<div align="center">
+
 # 🌏 KnowVis: A Dual-View Benchmark for Diagnosing World-Knowledge Grounding in Text-to-Image Models
+
+</div>
+
+<div align="center">
+
+  [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+  [![python version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FQuantumWhisper42%2Fanonymous_project%2Frefs%2Fheads%2Fmain%2Fpyproject.toml&logo=python)](#-dependencies)
+  [![QuantumWhisper42/anonymous_dataset](https://img.shields.io/badge/Huggingface-Data-blue?style=flat&logo=huggingface)](huggingface.co/datasets/QuantumWhisper42/anonymous_dataset)
+  [![leaderboard](https://img.shields.io/badge/Rank-Leaderboard-blue?style=flat)](#-leaderboard)
+
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="docs/assets/prompt-examples.png" alt="prompt-examples" width="100%">
+</div>
+
+<br/>
 
 ## 📖 Overview
 
@@ -6,7 +27,19 @@ Text-to-image (T2I) models have made substantial progress in visual realism, aes
 We introduce **KnowVis**, a dual-view diagnostic benchmark for world-knowledge grounding in T2I generation. KnowVis is built on a hierarchical knowledge taxonomy with case-level annotations, and contains two complementary views: a **Skill-Tree Benchmark** for fine-grained atomic knowledge evaluation and a **Generalized Benchmark** for open-ended knowledge composition and expression.
 We further design a shared MLLM-based VQA judge protocol for reliable evaluation and error attribution. The protocol uses Required VQAs to assess atomic knowledge correctness in the Skill-Tree Benchmark, and combines Required, Optional, and dynamically discovered knowledge expressions with human-judge collaborative evaluation in the Generalized Benchmark. Experiments show that KnowVis reveals notable gaps in world-knowledge grounding across existing T2I models, providing a unified basis for evaluating and improving knowledge-intensive image generation.
 
----
+<div align="center">
+  <img src="docs/assets/key-points.png" alt="key-points" width="100%">
+</div>
+
+## 🚀 Leaderboard
+
+Click the image to view rankings by category, education level, and knowledge operation type.
+
+<div align="center">
+  <a href="https://quantumwhisper42.github.io/anonymous_project/">
+    <img src="docs/assets/leaderboard.png" alt="leaderboard" width="100%">
+  </a>
+</div>
 
 ## ℹ️ Project Overview
 
@@ -201,6 +234,14 @@ Parameters:
 - `mode`: Evaluation mode. Used for ablation studies and to distinguish between the Skill-Tree Benchmark and the Generalized Benchmark. Supports `baseline`, `skip_label`, `skip_knowledge_hint`, `skip_visual_grounding`, `skip_all`, and `general`. Default: `baseline`.
 
 Upon completion, evaluation results are saved to `output/<task_name>/judged_vqa_checklist_{language}.jsonl`.
+
+
+## 🖼 Examples of VQA Checklists
+
+<div align="center">
+  <img src="docs/assets/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
+</div>
+
 
 ## 📜 License
 

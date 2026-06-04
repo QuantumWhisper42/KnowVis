@@ -1,0 +1,653 @@
+{
+  "meta": {
+    "eyebrow": "KnowVis Benchmark Leaderboard",
+    "title": "🌏 Skill-Tree Benchmark",
+    "subtitle": "Case-level correctness results for world-knowledge visual generation models.<br/>Click the button below to view internal rankings and rating data for slices",
+    "scoreRange": "0-1",
+    "footerNote": "Scores are from the KnowVis Skill-Tree benchmark evaluation."
+  },
+  "models": [
+    {
+      "key": "nano_banana_2",
+      "name": "Nano Banana 2",
+      "logo": "assets/logos/Google.svg"
+    },
+    {
+      "key": "nano_banana_pro",
+      "name": "Nano Banana Pro",
+      "logo": "assets/logos/Google.svg"
+    },
+    {
+      "key": "gpt_image_2",
+      "name": "GPT-Image-2.0",
+      "logo": "assets/logos/OpenAI.svg"
+    },
+    {
+      "key": "flux2_pro",
+      "name": "FLUX.2 Pro",
+      "logo": "assets/logos/Black_Forest_Labs.svg"
+    },
+    {
+      "key": "flux2_dev",
+      "name": "FLUX.2 Dev",
+      "logo": "assets/logos/Black_Forest_Labs.svg"
+    },
+    {
+      "key": "recraft_v4",
+      "name": "Recraft v4",
+      "logo": "assets/logos/Recraft.png"
+    },
+    {
+      "key": "qwen_image_2",
+      "name": "Qwen Image 2.0",
+      "logo": "assets/logos/Alibaba.svg"
+    },
+    {
+      "key": "qwen_image_2512",
+      "name": "Qwen Image 2512",
+      "logo": "assets/logos/Alibaba.svg"
+    },
+    {
+      "key": "wan_2_7_pro",
+      "name": "Wan 2.7 Pro",
+      "logo": "assets/logos/Alibaba.svg"
+    },
+    {
+      "key": "hunyuan_image_3",
+      "name": "HunyuanImage 3.0",
+      "logo": "assets/logos/Tencent.svg"
+    },
+    {
+      "key": "midjourney_v7",
+      "name": "Midjourney v7",
+      "logo": "assets/logos/Midjourney.png"
+    },
+    {
+      "key": "seedream_4",
+      "name": "Seedream 4.0",
+      "logo": "assets/logos/ByteDance_Seed.svg"
+    },
+    {
+      "key": "seedream_4_5",
+      "name": "Seedream 4.5",
+      "logo": "assets/logos/ByteDance_Seed.svg"
+    },
+    {
+      "key": "seedream_5_lite",
+      "name": "Seedream 5.0 Lite",
+      "logo": "assets/logos/ByteDance_Seed.svg"
+    },
+    {
+      "key": "internal_model_a",
+      "name": "Internal Model A",
+      "logoEmoji": "🎭"
+    }
+  ],
+  "sliceGroups": {
+    "domain": {
+      "label": "Overall & Top-level Domains",
+      "order": 1,
+      "slices": [
+        {
+          "key": "all",
+          "label": "Overall",
+          "values": [
+            0.808,
+            0.704,
+            0.756,
+            0.427,
+            0.175,
+            0.584,
+            0.521,
+            0.179,
+            0.449,
+            0.534,
+            0.172,
+            0.342,
+            0.406,
+            0.608,
+            0.271
+          ],
+          "emoji": "🏆",
+          "shortLabel": "Overall"
+        },
+        {
+          "key": "natural_science",
+          "label": "Natural Science",
+          "values": [
+            0.825,
+            0.711,
+            0.699,
+            0.389,
+            0.123,
+            0.579,
+            0.455,
+            0.158,
+            0.398,
+            0.456,
+            0.132,
+            0.298,
+            0.325,
+            0.527,
+            0.219
+          ],
+          "emoji": "🔬"
+        },
+        {
+          "key": "formal_science",
+          "label": "Formal Science",
+          "values": [
+            0.917,
+            0.854,
+            0.875,
+            0.313,
+            0.042,
+            0.514,
+            0.646,
+            0.063,
+            0.625,
+            0.542,
+            0.022,
+            0.333,
+            0.417,
+            0.729,
+            0.125
+          ],
+          "emoji": "📐"
+        },
+        {
+          "key": "human_civilization_and_society",
+          "label": "Human Civilization & Society",
+          "values": [
+            0.718,
+            0.603,
+            0.766,
+            0.551,
+            0.333,
+            0.625,
+            0.541,
+            0.282,
+            0.413,
+            0.649,
+            0.321,
+            0.41,
+            0.519,
+            0.649,
+            0.436
+          ],
+          "emoji": "🏛️"
+        }
+      ]
+    },
+    "subdomain": {
+      "label": "Knowledge Subdomains",
+      "order": 2,
+      "slices": [
+        {
+          "key": "physics",
+          "label": "Physics",
+          "values": [
+            0.809,
+            0.66,
+            0.587,
+            0.319,
+            0.085,
+            0.617,
+            0.362,
+            0.106,
+            0.468,
+            0.319,
+            0.064,
+            0.255,
+            0.34,
+            0.447,
+            0.213
+          ],
+          "emoji": "⚛️",
+          "shortLabel": "Physics"
+        },
+        {
+          "key": "chemistry",
+          "label": "Chemistry",
+          "values": [
+            0.652,
+            0.565,
+            0.739,
+            0.348,
+            0.0,
+            0.435,
+            0.455,
+            0.13,
+            0.348,
+            0.522,
+            0.13,
+            0.348,
+            0.391,
+            0.364,
+            0.174
+          ],
+          "emoji": "🧪",
+          "shortLabel": "Chemistry"
+        },
+        {
+          "key": "biology",
+          "label": "Biology",
+          "values": [
+            1.0,
+            0.846,
+            0.923,
+            0.308,
+            0.0,
+            0.538,
+            0.308,
+            0.0,
+            0.308,
+            0.615,
+            0.0,
+            0.231,
+            0.308,
+            0.5,
+            0.077
+          ],
+          "emoji": "🧬",
+          "shortLabel": "Biology"
+        },
+        {
+          "key": "climate_and_astronomy",
+          "label": "Climate & Astronomy",
+          "values": [
+            0.9,
+            0.8,
+            0.7,
+            0.526,
+            0.3,
+            0.55,
+            0.55,
+            0.25,
+            0.35,
+            0.5,
+            0.3,
+            0.4,
+            0.25,
+            0.7,
+            0.4
+          ],
+          "emoji": "🌦️",
+          "shortLabel": "Climate & Astronomy"
+        },
+        {
+          "key": "physical_geography",
+          "label": "Physical Geography",
+          "values": [
+            0.909,
+            0.909,
+            0.818,
+            0.636,
+            0.364,
+            0.818,
+            0.9,
+            0.455,
+            0.4,
+            0.636,
+            0.273,
+            0.273,
+            0.273,
+            0.909,
+            0.182
+          ],
+          "emoji": "🗻",
+          "shortLabel": "Physical Geography"
+        },
+        {
+          "key": "mathematics",
+          "label": "Mathematics",
+          "values": [
+            0.917,
+            0.854,
+            0.875,
+            0.313,
+            0.042,
+            0.514,
+            0.646,
+            0.063,
+            0.625,
+            0.542,
+            0.022,
+            0.333,
+            0.417,
+            0.729,
+            0.125
+          ],
+          "emoji": "📊",
+          "shortLabel": "Mathematics"
+        },
+        {
+          "key": "history_and_culture",
+          "label": "History & Culture",
+          "values": [
+            0.667,
+            0.606,
+            0.813,
+            0.636,
+            0.242,
+            0.625,
+            0.516,
+            0.303,
+            0.375,
+            0.581,
+            0.394,
+            0.364,
+            0.515,
+            0.606,
+            0.455
+          ],
+          "emoji": "📜",
+          "shortLabel": "History & Culture"
+        },
+        {
+          "key": "humanities_and_architecture",
+          "label": "Humanities & Architecture",
+          "values": [
+            0.833,
+            0.722,
+            0.833,
+            0.667,
+            0.556,
+            0.667,
+            0.611,
+            0.5,
+            0.444,
+            0.722,
+            0.611,
+            0.389,
+            0.556,
+            0.722,
+            0.444
+          ],
+          "emoji": "🏛️",
+          "shortLabel": "Humanities & Architecture"
+        },
+        {
+          "key": "language_and_writing",
+          "label": "Language & Writing",
+          "values": [
+            0.857,
+            0.571,
+            0.571,
+            0.143,
+            0.143,
+            1.0,
+            0.857,
+            0.0,
+            0.714,
+            0.857,
+            0.0,
+            0.714,
+            0.857,
+            0.857,
+            0.571
+          ],
+          "emoji": "✍️",
+          "shortLabel": "Language & Writing"
+        },
+        {
+          "key": "general_social_knowledge",
+          "label": "General Social Knowledge",
+          "values": [
+            0.4,
+            0.5,
+            0.7,
+            0.4,
+            0.2,
+            0.4,
+            0.444,
+            0.2,
+            0.222,
+            0.667,
+            0.0,
+            0.4,
+            0.4,
+            0.6,
+            0.3
+          ],
+          "emoji": "🌐",
+          "shortLabel": "Social Knowledge"
+        },
+        {
+          "key": "occupations_and_identities",
+          "label": "Occupations & Identities",
+          "values": [
+            1.0,
+            0.6,
+            0.8,
+            0.6,
+            0.6,
+            0.5,
+            0.2,
+            0.2,
+            0.4,
+            0.2,
+            0.0,
+            0.4,
+            0.4,
+            0.4,
+            0.2
+          ],
+          "emoji": "👥",
+          "shortLabel": "Occupations & Identities"
+        },
+        {
+          "key": "systems_and_processes",
+          "label": "Systems & Processes",
+          "values": [
+            0.8,
+            0.4,
+            0.6,
+            0.4,
+            0.4,
+            0.8,
+            0.5,
+            0.0,
+            0.5,
+            1.0,
+            0.2,
+            0.4,
+            0.25,
+            0.75,
+            0.6
+          ],
+          "emoji": "⚙️",
+          "shortLabel": "Systems & Processes"
+        }
+      ]
+    },
+    "education": {
+      "label": "Education Level",
+      "order": 3,
+      "slices": [
+        {
+          "key": "primary_school",
+          "label": "Primary School",
+          "values": [
+            0.917,
+            0.667,
+            0.833,
+            0.458,
+            0.167,
+            0.667,
+            0.458,
+            0.125,
+            0.458,
+            0.583,
+            0.083,
+            0.333,
+            0.542,
+            0.583,
+            0.333
+          ],
+          "emoji": "🎒"
+        },
+        {
+          "key": "junior_high_school",
+          "label": "Junior High School",
+          "values": [
+            0.841,
+            0.738,
+            0.736,
+            0.402,
+            0.15,
+            0.592,
+            0.519,
+            0.196,
+            0.453,
+            0.495,
+            0.151,
+            0.346,
+            0.393,
+            0.581,
+            0.271
+          ],
+          "emoji": "📓"
+        },
+        {
+          "key": "high_school",
+          "label": "High School",
+          "values": [
+            0.79,
+            0.71,
+            0.754,
+            0.403,
+            0.194,
+            0.519,
+            0.59,
+            0.194,
+            0.459,
+            0.548,
+            0.246,
+            0.29,
+            0.323,
+            0.629,
+            0.242
+          ],
+          "emoji": "🎓"
+        },
+        {
+          "key": "university",
+          "label": "University",
+          "values": [
+            0.786,
+            0.786,
+            0.857,
+            0.462,
+            0.143,
+            0.615,
+            0.429,
+            0.143,
+            0.357,
+            0.5,
+            0.286,
+            0.214,
+            0.357,
+            0.571,
+            0.071
+          ],
+          "emoji": "🏫"
+        },
+        {
+          "key": "professional_areas",
+          "label": "Professional Areas",
+          "values": [
+            0.667,
+            0.576,
+            0.727,
+            0.515,
+            0.242,
+            0.6,
+            0.484,
+            0.152,
+            0.452,
+            0.613,
+            0.121,
+            0.485,
+            0.531,
+            0.688,
+            0.364
+          ],
+          "emoji": "💼"
+        }
+      ]
+    },
+    "operation": {
+      "label": "Knowledge Operation",
+      "order": 4,
+      "slices": [
+        {
+          "key": "explicit_knowledge_recall",
+          "label": "Explicit Knowledge Recall",
+          "values": [
+            0.789,
+            0.698,
+            0.763,
+            0.434,
+            0.201,
+            0.574,
+            0.503,
+            0.201,
+            0.415,
+            0.526,
+            0.203,
+            0.332,
+            0.394,
+            0.614,
+            0.296
+          ],
+          "emoji": "🔍"
+        },
+        {
+          "key": "implicit_knowledge_recall",
+          "label": "Implicit Knowledge Recall",
+          "values": [
+            1.0,
+            1.0,
+            1.0,
+            0.667,
+            0.333,
+            0.667,
+            0.667,
+            0.333,
+            1.0,
+            0.5,
+            0.333,
+            0.667,
+            0.667,
+            1.0,
+            0.333
+          ],
+          "emoji": "📖"
+        },
+        {
+          "key": "knowledge_reasoning",
+          "label": "Knowledge Reasoning",
+          "values": [
+            0.895,
+            0.711,
+            0.711,
+            0.368,
+            0.026,
+            0.643,
+            0.605,
+            0.053,
+            0.579,
+            0.579,
+            0.0,
+            0.368,
+            0.447,
+            0.553,
+            0.132
+          ],
+          "emoji": "🧠"
+        }
+      ]
+    }
+  }
+}

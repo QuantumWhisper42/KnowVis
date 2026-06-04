@@ -1,4 +1,25 @@
+<div align="center">
+
 # 🌏 KnowVis：用于诊断文生图模型世界知识定位能力的双视角基准
+
+</div>
+
+<div align="center">
+
+  [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+  [![python version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FQuantumWhisper42%2Fanonymous_project%2Frefs%2Fheads%2Fmain%2Fpyproject.toml&logo=python)](#-dependencies)
+  [![QuantumWhisper42/anonymous_dataset](https://img.shields.io/badge/Huggingface-Data-blue?style=flat&logo=huggingface)](huggingface.co/datasets/QuantumWhisper42/anonymous_dataset)
+  [![leaderboard](https://img.shields.io/badge/Rank-Leaderboard-blue?style=flat)](#-leaderboard)
+
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="docs/assets/prompt-examples.png" alt="prompt-examples" width="100%">
+</div>
+
+<br/>
 
 ## 📖 概述
 
@@ -8,7 +29,19 @@
 
 我们进一步设计了一套基于多模态大语言模型（MLLM）的 VQA 评判协议，用于可靠评估和错误归因。该协议在技能树基准中使用"必答 VQA"评估原子知识的正确性；在泛化基准中，则将必答项、选答项和动态发现的知识表达与人工评判协作评估相结合。实验表明，KnowVis 能够揭示现有 T2I 模型在世界知识定位方面的显著差距，为评估和改进知识密集型图像生成提供了统一基础。
 
----
+<div align="center">
+  <img src="docs/assets/key-points.png" alt="key-points" width="100%">
+</div>
+
+## 🚀 排行榜
+
+Click the image to view rankings by category, education level, and knowledge operation type.
+
+<div align="center">
+  <a href="https://quantumwhisper42.github.io/anonymous_project/">
+    <img src="docs/assets/leaderboard.png" alt="leaderboard" width="100%">
+  </a>
+</div>
 
 # ℹ️ 项目简介
 
@@ -201,6 +234,14 @@ python main.py judge <task_name> --language=<en|zh> --use-additional=<true|false
 - `mode`：评测模式。用于消融实验和区分基础技能树和泛化评测集，支持 `baseline`、`skip_label`、`skip_knowledge_hint`、`skip_visual_grounding`、`skip_all` 和 `general`。默认为 `baseline`
 
 执行完成后，生成的评测结果将被保存在 `output/<task_name>/judged_vqa_checklist_{language}.jsonl` 文件中。
+
+
+## 🖼 VQA 检查项示例
+
+<div align="center">
+  <img src="docs/assets/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
+</div>
+
 
 ## 📜 许可证
 
