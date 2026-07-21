@@ -8,7 +8,7 @@
 
   [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
   [![python version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FQuantumWhisper42%2Fanonymous_project%2Frefs%2Fheads%2Fmain%2Fpyproject.toml&logo=python)](#-dependencies)
-  [![QuantumWhisper42/anonymous_dataset](https://img.shields.io/badge/Huggingface-Data-blue?style=flat&logo=huggingface)](huggingface.co/datasets/QuantumWhisper42/anonymous_dataset)
+  [![QuantumWhisper42/anonymous_dataset](https://img.shields.io/badge/Huggingface-Data-blue?style=flat&logo=huggingface)](https://huggingface.co/datasets/QuantumWhisper42/anonymous_dataset)
   [![leaderboard](https://img.shields.io/badge/Rank-Leaderboard-blue?style=flat)](#-leaderboard)
 
 </div>
