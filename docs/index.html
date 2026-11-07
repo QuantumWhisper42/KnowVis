@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title></title>
-  <meta name="description" content="" />
+  <title>KnowVis Benchmark Leaderboard</title>
+  <meta name="description" content="Case-level correctness results for world-knowledge visual generation models on the KnowVis Skill-Tree Benchmark." />
 
   <style>
     :root {
@@ -495,10 +495,10 @@
 
     function validateData(data) {
       if (!data || !Array.isArray(data.models) || data.models.length === 0) {
-        throw new Error('leaderboard.json 缺少 models 数组，或 models 为空。');
+        throw new Error('skill-tree.json 缺少 models 数组，或 models 为空。');
       }
       if (!data.sliceGroups || typeof data.sliceGroups !== 'object') {
-        throw new Error('leaderboard.json 缺少 sliceGroups 对象。');
+        throw new Error('skill-tree.json 缺少 sliceGroups 对象。');
       }
 
       const modelCount = data.models.length;
@@ -730,7 +730,7 @@
       console.error(err);
       body.innerHTML = '<div class="empty-state">Failed to load leaderboard data.</div>';
       errorMessage.style.display = 'block';
-      errorMessage.textContent = `${err.message} 请确认文件存在：data/leaderboard.json，并通过 HTTP 服务访问页面。不要直接双击打开 index.html。`;
+      errorMessage.textContent = `${err.message} 请确认文件存在：data/skill-tree.json，并通过 HTTP 服务访问页面。不要直接双击打开 index.html。`;
     }
 
     async function init() {

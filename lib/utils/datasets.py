@@ -85,9 +85,16 @@ Or, you can create your own additional_vqa_checklist_{language}.jsonl by running
 
 
 def _dump_results(
-    data: Sequence[BaseModel], task_name: str, language: Language, filename_prefix: str
+    data: Sequence[BaseModel],
+    task_name: str,
+    language: Language,
+    filename_prefix: str,
+    filename_suffix: str | None = None,
 ) -> Path:
-    output_file = get_task_root(task_name) / f"{filename_prefix}_{language}.jsonl"
+    stem = f"{filename_prefix}_{language}"
+    if filename_suffix:
+        stem = f"{stem}_{filename_suffix}"
+    output_file = get_task_root(task_name) / f"{stem}.jsonl"
     with open(output_file, "w", encoding="utf-8") as f:
         for item in data:
             f.write(item.model_dump_json() + "\n")
@@ -113,6 +120,18 @@ def dump_image_analysis_results(
 
 
 def dump_judge_image_results(
-    data: Sequence[JudgedVQAChecklist], task_name: str, language: Language
+    data: Sequence[JudgedVQAChecklist],
+    task_name: str,
+    language: Language,
+    model_name: str,
+    image_source_slug: str | None = None,
 ) -> Path:
-    return _dump_results(data, task_name, language, "judged_vqa_checklist")
+    return _dump_results(
+        data,
+        task_name,
+        language,
+        "judged_vqa_checklist",
+        filename_suffix=model_name
+        if image_source_slug is None
+        else f"{model_name}_{image_source_slug}",
+    )

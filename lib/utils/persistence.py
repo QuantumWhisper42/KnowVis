@@ -1,13 +1,17 @@
-from collections.abc import AsyncIterator
+import asyncio
+from collections.abc import AsyncIterator, Callable
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager, closing
 from dataclasses import dataclass, field
+import os
 from pathlib import Path
 import sqlite3
+import threading
 from time import perf_counter
 
 import anyio
 import pydantic
-from pydantic_graph import Graph, GraphRunResult, _utils as _graph_utils, exceptions
+from pydantic_graph import Graph, GraphRunResult, exceptions
 from pydantic_graph.nodes import BaseNode, DepsT, End
 from pydantic_graph.persistence import (
     BaseStatePersistence,
@@ -23,7 +27,49 @@ from pydantic_graph.persistence import (
 
 from lib.utils.common import PROJECT_ROOT
 
-DB_PATH = PROJECT_ROOT / "data" / "db"
+DB_DIR_ENV_VAR = "PERSISTENCE_DB_DIR"
+"""Where to keep the resume databases, overriding `<project>/data/db`.
+
+Point this at local disk whenever the checkout lives on a network filesystem. Every
+node transition is a read-modify-write handled by a single writer thread, so the
+per-operation latency of the filesystem becomes the rate at which cases can start at
+all: a graph run cannot enter its first node until `load_next` has written. These
+databases only hold resume state, so keeping them off shared storage costs nothing.
+
+SQLite's WAL mode, which `_init_db` enables, is in any case documented as not working
+over a network filesystem: the wal-index is a mmapped file that all readers must share.
+"""
+
+
+def _db_dir() -> Path:
+    if override := os.environ.get(DB_DIR_ENV_VAR):
+        return Path(override).expanduser()
+    return PROJECT_ROOT / "data" / "db"
+
+
+DB_PATH = _db_dir()
+
+CONNECT_TIMEOUT_SECONDS = 30.0
+"""How long a connection waits for the file lock before giving up with "database is locked".
+
+A judge run drives hundreds of cases at once against a single database file, so the 5s
+default is far too short for the write queue that builds up at the start of a run.
+"""
+
+DB_WORKERS = min(32, (os.cpu_count() or 1) + 4)
+"""Threads for snapshot I/O, matching what the default executor would have offered."""
+
+_db_registry_lock = threading.Lock()
+_db_write_locks: dict[Path, threading.Lock] = {}
+_initialized_dbs: set[Path] = set()
+
+# Snapshot I/O deliberately keeps off the default executor. On a slow filesystem this
+# queue grows long enough that everything else reaching for a thread through
+# `asyncio.to_thread` -- loading a case's images, for one -- would wait behind the whole
+# backlog before it could even start, which stalls the model calls with it.
+_db_executor = ThreadPoolExecutor(
+    max_workers=DB_WORKERS, thread_name_prefix="persistence"
+)
 
 
 def get_persistance_db(
@@ -32,6 +78,36 @@ def get_persistance_db(
     if not DB_PATH.exists():
         DB_PATH.mkdir(parents=True, exist_ok=True)
     return DB_PATH / f"{task_type}.db"
+
+
+def _connect(db_path: Path) -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path, timeout=CONNECT_TIMEOUT_SECONDS)
+    # journal_mode lives in the database header, but these two are per-connection and so
+    # have to be repeated. Under WAL, synchronous=NORMAL only fsyncs on checkpoints, which
+    # keeps each write transaction short enough that concurrent cases stop piling up.
+    conn.execute("PRAGMA synchronous=NORMAL;")
+    conn.execute("PRAGMA temp_store=MEMORY;")
+    return conn
+
+
+def _write_lock(db_path: Path) -> threading.Lock:
+    """One writer at a time per database file.
+
+    Snapshots are stored as a single JSON blob per run, so every node transition is a
+    read-modify-write of the whole run. Queuing those in-process is much cheaper than
+    letting a few dozen executor threads busy-poll SQLite's file lock until it times out.
+
+    Deliberately a lock rather than a single-threaded executor: a lock hands off to
+    whichever waiter wins the race, so a run that has its own writes done can move on
+    while others still queue. Strict submission order would instead hold every run back
+    until the slowest predecessor finished.
+    """
+    with _db_registry_lock:
+        return _db_write_locks.setdefault(db_path, threading.Lock())
+
+
+async def _in_db_executor[T](func: Callable[..., T], *args: object) -> T:
+    return await asyncio.get_running_loop().run_in_executor(_db_executor, func, *args)
 
 
 async def run_persistent(
@@ -139,13 +215,11 @@ class SQLite3StatePersistence(BaseStatePersistence[StateT, RunEndT]):
             yield
         except Exception:
             duration = perf_counter() - start
-            await _graph_utils.run_in_executor(
-                self._after_run_sync, snapshot_id, duration, "error"
-            )
+            await _in_db_executor(self._after_run_sync, snapshot_id, duration, "error")
             raise
         else:
             snapshot.duration = perf_counter() - start
-            await _graph_utils.run_in_executor(
+            await _in_db_executor(
                 self._after_run_sync, snapshot_id, snapshot.duration, "success"
             )
 
@@ -173,7 +247,20 @@ class SQLite3StatePersistence(BaseStatePersistence[StateT, RunEndT]):
         )
 
     async def reset_error_or_running_snapshots(self) -> None:
+        """Make an interrupted run resumable again.
+
+        Besides the obvious `pending`/`running`/`error` leftovers, this revives a run whose
+        last node succeeded but never got a successor: `GraphRun.next` marks a node
+        successful before snapshotting the node it returned, so an interruption in between
+        (a crash, or a failed snapshot write) leaves `load_next` with nothing to hand out
+        and every later attempt dies with `GraphRuntimeError("Unable to restore snapshot
+        from state persistence.")`. Snapshots hold the state from *before* their node ran,
+        so re-running the last one simply recreates the missing successor.
+        """
         snapshots = await self.load_all()
+        if not snapshots or any(isinstance(s, EndSnapshot) for s in snapshots):
+            return
+
         changed = False
         for snapshot in snapshots:
             if isinstance(snapshot, NodeSnapshot) and snapshot.status in {
@@ -183,17 +270,28 @@ class SQLite3StatePersistence(BaseStatePersistence[StateT, RunEndT]):
             }:
                 snapshot.status = "created"
                 changed = True
+
+        if not any(
+            isinstance(s, NodeSnapshot) and s.status == "created" for s in snapshots
+        ):
+            last_node = next(
+                (s for s in reversed(snapshots) if isinstance(s, NodeSnapshot)), None
+            )
+            if last_node is not None:
+                last_node.status = "created"
+                changed = True
+
         if changed:
             await self._save(snapshots)
 
     async def load_all(self) -> list[Snapshot[StateT, RunEndT]]:
-        return await _graph_utils.run_in_executor(self._load_sync)
+        return await _in_db_executor(self._load_sync)
 
     def _load_sync(self) -> list[Snapshot[StateT, RunEndT]]:
         assert self._snapshots_type_adapter is not None, (
             "snapshots type adapter must be set"
         )
-        with sqlite3.connect(self.db_path, timeout=30.0) as conn:
+        with closing(_connect(self.db_path)) as conn:
             row = conn.execute(
                 "SELECT snapshots FROM graph_runs WHERE run_id = ?", (self.run_id,)
             ).fetchone()
@@ -213,13 +311,13 @@ class SQLite3StatePersistence(BaseStatePersistence[StateT, RunEndT]):
 
     async def _save(self, snapshots: list[Snapshot[StateT, RunEndT]]) -> None:
         async with self.lock:
-            await _graph_utils.run_in_executor(self._save_sync, snapshots)
+            await _in_db_executor(self._save_sync, snapshots)
 
     def _save_sync(self, snapshots: list[Snapshot[StateT, RunEndT]]) -> None:
         assert self._snapshots_type_adapter
         json_data = self._snapshots_type_adapter.dump_json(snapshots).decode()
-        with closing(sqlite3.connect(self.db_path)) as conn:
-            with conn:
+        with _write_lock(self.db_path):
+            with closing(_connect(self.db_path)) as conn, conn:
                 conn.execute(
                     """
                     INSERT INTO graph_runs (run_id, snapshots)
@@ -239,16 +337,18 @@ class SQLite3StatePersistence(BaseStatePersistence[StateT, RunEndT]):
         await self._save(snapshots)
 
     def _init_db(self):
-        with closing(sqlite3.connect(self.db_path)) as conn:
-            with conn:
+        # One instance is created per case, so without this guard a judge run would take
+        # the exclusive lock needed by `journal_mode` hundreds of times, right while the
+        # first cases are already writing snapshots.
+        with _db_registry_lock:
+            if self.db_path in _initialized_dbs:
+                return
+            with closing(_connect(self.db_path)) as conn, conn:
                 conn.execute("PRAGMA journal_mode=WAL;")
-                conn.execute("PRAGMA busy_timeout=30000;")
-                conn.execute("PRAGMA temp_store=MEMORY;")
-                conn.execute("PRAGMA mmap_size=268435456;")
-                conn.execute("PRAGMA cache_size=2000;")
                 conn.execute("""
                     CREATE TABLE IF NOT EXISTS graph_runs (
                         run_id TEXT PRIMARY KEY,
                         snapshots TEXT NOT NULL
                     );
                 """)
+            _initialized_dbs.add(self.db_path)

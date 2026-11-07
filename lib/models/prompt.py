@@ -146,7 +146,7 @@ class VQAItemWithTypeAndScore(VQAItemWithType):
     id: int
     reasoning: str = Field(
         ...,
-        description="16:58Claude responded: The Judge's reasoning process for reaching the verdict on this VQA.The Judge's reasoning process for reaching the verdict on this VQA.",
+        description="The Judge's reasoning process for reaching the verdict on this VQA.",
     )
     judgment: JudgmentType = Field(
         ...,
@@ -247,10 +247,10 @@ class PromptAnalysisPipelineOutput(BaseModel):
                 judge_type=vqa.judge_type,
                 weight=vqa.weight,
                 knowledge_hint=vqa.knowledge_hint,
-                visual_grounding=VisualGrounding(  # TODO: maybe add license here
+                visual_grounding=VisualGrounding(
                     title="",
                     url=vqa.visual_grounding,
-                    source="",
+                    source=vqa.visual_grounding,
                     author="",
                     license="",
                     license_url="",
@@ -274,10 +274,10 @@ class ImageAnalysisPipelineOutput(BaseModel):
                 question=vqa.question,
                 component=vqa.component,
                 knowledge_hint=vqa.knowledge_hint,
-                visual_grounding=VisualGrounding(  # TODO: maybe add license here
+                visual_grounding=VisualGrounding(
                     title="",
                     url=vqa.visual_grounding,
-                    source="",
+                    source=vqa.visual_grounding,
                     author="",
                     license="",
                     license_url="",

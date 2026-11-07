@@ -14,7 +14,7 @@ import os
 DEFAULT_WIKIMEDIA_COMMONS_URL = "commons.wikimedia.org"
 DEFAULT_USER_AGENT = os.environ.get(
     "WIKIMEDIA_COMMONS_USER_AGENT",
-    "AnonymousProject/0.0 (anonymous_project@example.com)",
+    "KnowVis/0.1 (https://github.com/QuantumWhisper42/KnowVis)",
 )
 
 

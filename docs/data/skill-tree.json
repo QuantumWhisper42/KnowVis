@@ -2,9 +2,9 @@
   "meta": {
     "eyebrow": "KnowVis Benchmark Leaderboard",
     "title": "🌏 Skill-Tree Benchmark",
-    "subtitle": "Case-level correctness results for world-knowledge visual generation models.<br/>Click the button below to view internal rankings and rating data for slices",
+    "subtitle": "Case-level correctness results for world-knowledge visual generation models, organized by Skill-Tree evaluation slices.",
     "scoreRange": "0-1",
-    "footerNote": "Scores are from the KnowVis Skill-Tree benchmark evaluation."
+    "footerNote": "Scores are evaluated on the 240-case KnowVis Skill-Tree unseen validation split (val_gt) using Gemini 3.1 Pro Preview."
   },
   "models": [
     {
@@ -78,9 +78,9 @@
       "logo": "assets/logos/ByteDance_Seed.svg"
     },
     {
-      "key": "internal_model_a",
-      "name": "Internal Model A",
-      "logoEmoji": "🎭"
+      "key": "kling_image_3_0_omni",
+      "name": "Kling Image 3.0 Omni",
+      "logo": "assets/logos/klingai.svg"
     }
   ],
   "sliceGroups": {

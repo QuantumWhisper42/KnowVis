@@ -28,7 +28,7 @@ EXAMPLE_PATH = PROJECT_ROOT / "example"
 
 
 def _init_dataset(
-    repo_id: str = "QuantumWhisper42/anonymous_dataset",
+    repo_id: str = "QuantumWhisper42/KnowVis",
     repo_type: str = "dataset",
     assets: bool = False,
 ):
@@ -69,24 +69,29 @@ def _seed_task(
                 task_name,
                 language,
                 "images",
+                source=source,
             )
             _seed_task(
                 task_name,
                 language,
                 "taxonomy",
+                source=source,
             )
             _seed_task(
                 task_name,
                 language,
                 "vqa_checklist",
-                split=split,
+                split=split or "skill_tree",
+                source=source,
             )
             _seed_task(
                 task_name,
                 language,
                 "judge_performance",
-                judge_performance_split=judge_performance_split,
+                judge_performance_split=judge_performance_split or "val",
+                source=source,
             )
+            return
         case "images":
             source_path = seed_path / "assets"
             target_path = get_task_root(task_name=task_name) / "images"

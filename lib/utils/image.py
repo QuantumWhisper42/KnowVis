@@ -193,7 +193,7 @@ def get_thumbnail_from_url(
     return None
 
 
-def load_images_from_disk(path: Path, case_id: str) -> list[BinaryImage]:
+def resolve_local_image_paths(path: Path, case_id: str) -> list[Path]:
     if not path.is_dir():
         raise NotADirectoryError(f"{path!r} is not a directory")
 
@@ -212,9 +212,13 @@ def load_images_from_disk(path: Path, case_id: str) -> list[BinaryImage]:
 
     matched.sort(key=lambda t: t[0])
 
+    return [file for _, file in matched]
+
+
+def load_images_from_disk(path: Path, case_id: str) -> list[BinaryImage]:
     return [
         BinaryImage(data=file.read_bytes(), media_type="image/png")
-        for _, file in matched
+        for file in resolve_local_image_paths(path, case_id)
     ]
 
 

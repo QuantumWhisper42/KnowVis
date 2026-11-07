@@ -18,6 +18,12 @@ seed/
 # File output
 output/
 
+# Stat
+stat/
+
+# Judge model configs, they carry gateway credentials
+model_config/
+
 # Mac
 .DS_Store
 __MACOSX/
