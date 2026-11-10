@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KnowVis Benchmark Leaderboard</title>
+  <meta name="description" content="Case-level correctness results for world-knowledge visual generation models on the KnowVis Skill-Tree Benchmark." />
+
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: rgba(255, 255, 255, 0.92);
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-muted: rgba(255, 255, 255, 0.62);
+      --text: #172033;
+      --text-soft: #627083;
+      --muted: #7b8797;
+      --label: #9aa4b2;
+      --line: rgba(23, 32, 51, 0.09);
+      --line-soft: rgba(23, 32, 51, 0.055);
+      --track: #edf1f6;
+      --primary: #082845;
+      --primary-2: #103c62;
+      --primary-tint: rgba(8, 40, 69, 0.05);
+      --danger: #b42318;
+      --shadow-sm: 0 12px 34px rgba(15, 35, 62, 0.05);
+      --shadow-md: 0 18px 42px rgba(18, 39, 70, 0.08);
+      --shadow: 0 24px 60px rgba(13, 31, 58, 0.10);
+      --shadow-tab-active: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 10px 24px rgba(8, 40, 69, 0.22);
+      --radius: 22px;
+      --radius-sm: 18px;
+      --radius-pill: 999px;
+      --tracking-tight: -0.04em;
+      --tracking-caps: 0.14em;
+      --focus-ring: 0 0 0 4px rgba(8, 40, 69, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(218, 230, 244, 0.90), transparent 36%),
+        radial-gradient(circle at 80% 10%, rgba(233, 238, 246, 0.95), transparent 34%),
+        linear-gradient(180deg, #fbfcfe 0%, var(--bg) 100%);
+    }
+
+    .page {
+      width: min(1180px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 52px 0 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 34%);
+      gap: 28px;
+      align-items: start;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: var(--tracking-caps);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.4vw, 58px);
+      line-height: 1.02;
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .subtitle {
+      max-width: 780px;
+      margin: 16px 0 0;
+      color: var(--text-soft);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .summary-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+      padding: 16px 18px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: var(--tracking-caps);
+      text-transform: uppercase;
+    }
+
+    .summary-card strong {
+      font-size: clamp(18px, 2.2vw, 26px);
+      line-height: 1.2;
+      letter-spacing: var(--tracking-tight);
+      word-break: break-word;
+    }
+
+    .leaderboard-section {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 8px);
+      background: var(--surface-muted);
+      box-shadow: var(--shadow);
+    }
+
+    .tabs-wrap {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .tab-group-label {
+      margin: 0 0 9px;
+      color: var(--label);
+      padding: 8px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: var(--tracking-caps);
+      text-transform: uppercase;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      background: var(--surface-muted);
+    }
+
+    .tab-button {
+      min-height: 38px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: color 220ms ease, transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
+    }
+
+    .tab-button:hover {
+      transform: translateY(-1px);
+      color: var(--text);
+      background: var(--primary-tint);
+    }
+
+    .tab-button.active {
+      color: #fff;
+      background: linear-gradient(180deg, var(--primary-2), var(--primary));
+      box-shadow: var(--shadow-tab-active);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin: 0 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .slice-title {
+      margin: 0;
+      padding: 8px;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .search-box {
+      width: min(280px, 100%);
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 0 14px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .search-box:focus {
+      border-color: rgba(8, 40, 69, 0.28);
+      box-shadow: var(--focus-ring);
+    }
+
+    .table-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow-md);
+    }
+
+    .table-head,
+    .row {
+      display: grid;
+      grid-template-columns: 40px minmax(220px, 1.15fr) minmax(320px, 2.4fr) 92px;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .table-head {
+      min-height: 58px;
+      padding: 0 22px;
+      color: var(--label);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: var(--tracking-caps);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 60%, transparent));
+    }
+
+    .table-head > div:last-child {
+      text-align: right;
+    }
+
+    .leaderboard-body {
+      min-height: 560px;
+      position: relative;
+    }
+
+    .leaderboard-body.fade-out .row {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .row {
+      min-height: 72px;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line-soft);
+      transition: opacity 240ms ease, transform 240ms ease, background 180ms ease;
+      opacity: 1;
+      animation: rowIn 420ms both cubic-bezier(.22,.61,.36,1);
+    }
+
+    .row:hover { background: var(--surface-muted); }
+    .row:last-child { border-bottom: 0; }
+
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .rank {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .medal { font-size: 17px; }
+
+    .model {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 32px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    .logo-emoji {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .model-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .bar-track {
+      position: relative;
+      height: 13px;
+      overflow: hidden;
+      border-radius: var(--radius-pill);
+      background: var(--track);
+      box-shadow: inset 0 1px 2px rgba(10, 31, 58, 0.05);
+    }
+
+    .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(90deg, var(--row-color), color-mix(in srgb, var(--row-color) 76%, #ffffff));
+      transition: width 780ms cubic-bezier(.22,.61,.36,1);
+    }
+
+    .score {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 900;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .footer-note,
+    .error-message {
+      padding: 8px;
+      margin: 18px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .footer-note ul {
+      margin: 10px 0 0;
+      padding-left: 1.2em;
+    }
+
+    .footer-note li + li {
+      margin-top: 4px;
+    }
+
+    .error-message {
+      display: none;
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      .page { width: min(100vw - 24px, 760px); padding-top: 34px; }
+      .hero { grid-template-columns: 1fr; }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        gap: 10px;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .table-head { display: none; }
+      .leaderboard-body { min-height: 0; }
+      .row {
+        grid-template-columns: 38px 1fr 70px;
+        grid-template-areas:
+          "rank model score"
+          "rank bar bar";
+        gap: 9px 12px;
+        min-height: 92px;
+        padding: 14px 14px;
+      }
+      .rank { grid-area: rank; }
+      .model { grid-area: model; }
+      .bar-track { grid-area: bar; }
+      .score { grid-area: score; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <p class="eyebrow" id="eyebrow"></p>
+        <h1 id="pageTitle"></h1>
+        <p class="subtitle" id="pageSubtitle"></p>
+      </div>
+      <div class="summary-grid" aria-label="overall leader">
+        <div class="summary-card"><span>Overall Leader</span><strong id="overallLeaderName">--</strong></div>
+        <div class="summary-card"><span>Overall Best Score</span><strong id="overallLeaderScore">--</strong></div>
+      </div>
+    </section>
+
+    <section class="leaderboard-section" aria-label="leaderboard">
+      <div class="tabs-wrap" id="tabsWrap"></div>
+
+      <div class="toolbar">
+        <p class="slice-title" id="sliceTitle"></p>
+        <input class="search-box" id="modelSearch" type="search" placeholder="Search model..." autocomplete="off" />
+      </div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div></div>
+          <div>Model</div>
+          <div>Correctness Score</div>
+          <div>Score</div>
+        </div>
+        <div class="leaderboard-body" id="leaderboardBody" aria-live="polite">
+          <div class="empty-state"></div>
+        </div>
+      </div>
+
+      <p class="error-message" id="errorMessage"></p>
+      <div class="footer-note" id="footerNote"></div>
+    </section>
+  </main>
+
+  <script>
+    const DATA_URL = '../docs/data/skill-tree.json';
+
+    const DEFAULT_COLORS = [
+      '#9acb76', '#75b5a9', '#e8d87d', '#5fa1d7', '#a4c884',
+      '#79b887', '#93c4a0', '#72a8c2', '#94c26e', '#d8ca84',
+      '#e2aa92', '#a8a6df', '#d7b3dd', '#87c7e0', '#b8c5d6'
+    ];
+
+    let appData = null;
+    let models = [];
+    let sliceGroups = {};
+    let state = {
+      groupKey: null,
+      sliceKey: null,
+      searchText: ''
+    };
+
+    const tabsWrap = document.getElementById('tabsWrap');
+    const body = document.getElementById('leaderboardBody');
+    const searchInput = document.getElementById('modelSearch');
+    const errorMessage = document.getElementById('errorMessage');
+
+    async function loadData() {
+      const response = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Failed to load ${DATA_URL}. HTTP status: ${response.status}`);
+      }
+      return response.json();
+    }
+
+    function validateData(data) {
+      if (!data || !Array.isArray(data.models) || data.models.length === 0) {
+        throw new Error('skill-tree.json 缺少 models 数组，或 models 为空。');
+      }
+      if (!data.sliceGroups || typeof data.sliceGroups !== 'object') {
+        throw new Error('skill-tree.json 缺少 sliceGroups 对象。');
+      }
+
+      const modelCount = data.models.length;
+      Object.entries(data.sliceGroups).forEach(([groupKey, group]) => {
+        if (!Array.isArray(group.slices)) {
+          throw new Error(`sliceGroups.${groupKey}.slices 必须是数组。`);
+        }
+        group.slices.forEach(slice => {
+          if (!slice.label) {
+            throw new Error(`Slice「${slice.key}」缺少 label 字段。`);
+          }
+          if (!Array.isArray(slice.values) || slice.values.length !== modelCount) {
+            throw new Error(`Slice「${slice.label}」的 values 长度必须与 models 数量一致。`);
+          }
+        });
+      });
+    }
+
+    function sliceTabLabel(slice) {
+      return slice.emoji ? `${slice.emoji} ${slice.label}` : slice.label;
+    }
+
+    function initPageMeta(data) {
+      const meta = data.meta || {};
+
+      if (meta.title) {
+        document.title = meta.title;
+        document.getElementById('pageTitle').textContent = meta.title;
+      }
+      if (meta.eyebrow) {
+        document.getElementById('eyebrow').textContent = meta.eyebrow;
+      }
+      if (meta.subtitle) {
+        document.getElementById('pageSubtitle').innerHTML = meta.subtitle;
+      }
+      if (meta.description) {
+        document.querySelector('meta[name="description"]').setAttribute('content', meta.description);
+      }
+      renderFooterNote(data);
+    }
+
+    function renderFooterNote(data) {
+      const meta = data.meta || {};
+      const parts = [];
+      if (meta.footerNote) parts.push(meta.footerNote);
+
+      const stats = [];
+      if (models.length) stats.push(`Evaluated models: ${models.length}`);
+      if (meta.scoreRange) stats.push(`Score range: ${meta.scoreRange}`);
+      if (stats.length) {
+        const items = stats.map(item => `<li>${safeText(item)}</li>`).join('');
+        parts.push(`<ul>${items}</ul>`);
+      }
+
+      document.getElementById('footerNote').innerHTML = parts.join('');
+    }
+
+    function getOverallSlice() {
+      for (const group of Object.values(sliceGroups)) {
+        const slice = group.slices?.find(item => item.key === 'all');
+        if (slice) return slice;
+      }
+      return null;
+    }
+
+    function renderOverallLeader() {
+      const slice = getOverallSlice();
+      const leader = slice ? rowsFromValues(slice.values)[0] : null;
+      const nameEl = document.getElementById('overallLeaderName');
+      const scoreEl = document.getElementById('overallLeaderScore');
+
+      if (!leader) {
+        nameEl.textContent = '--';
+        nameEl.title = '';
+        scoreEl.textContent = '--';
+        return;
+      }
+
+      nameEl.textContent = `🏆 ${leader.name}`;
+      nameEl.title = leader.name;
+      scoreEl.textContent = `📊 ${leader.score.toFixed(2)}`;
+    }
+
+    function getOrderedGroupKeys() {
+      return Object.entries(sliceGroups)
+        .sort((a, b) => (a[1].order ?? 999) - (b[1].order ?? 999))
+        .map(([key]) => key);
+    }
+
+    function getActiveGroup() {
+      return sliceGroups[state.groupKey];
+    }
+
+    function getActiveSlice() {
+      const group = getActiveGroup();
+      if (!group) return null;
+      return group.slices.find(item => item.key === state.sliceKey) || group.slices[0];
+    }
+
+    function rowsFromValues(values) {
+      return models.map((model, i) => ({
+        ...model,
+        score: Number(values[i]),
+        color: model.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length]
+      })).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+    }
+
+    function medal(rank) {
+      if (rank === 1) return '<span class="medal">🥇</span>';
+      if (rank === 2) return '<span class="medal">🥈</span>';
+      if (rank === 3) return '<span class="medal">🥉</span>';
+      return rank;
+    }
+
+    function safeText(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function renderModelLogo(row) {
+      if (row.logoEmoji) {
+        return `<div class="logo logo-emoji" aria-hidden="true">${safeText(row.logoEmoji)}</div>`;
+      }
+      if (row.logo) {
+        const src = encodeURI(/^(?:https?:|\/|\.\.\/)/.test(row.logo) ? row.logo : '../docs/' + row.logo);
+        return `<div class="logo"><img src="${safeText(src)}" alt="" loading="lazy" decoding="async" /></div>`;
+      }
+      return `<div class="logo logo-emoji">${safeText(row.name.slice(0, 2).toUpperCase())}</div>`;
+    }
+
+    function renderTabs() {
+      tabsWrap.innerHTML = '';
+
+      getOrderedGroupKeys().forEach(groupKey => {
+        const group = sliceGroups[groupKey];
+        const block = document.createElement('div');
+        const label = document.createElement('p');
+        const tabs = document.createElement('div');
+
+        label.className = 'tab-group-label';
+        label.textContent = group.label || groupKey;
+        tabs.className = 'tabs';
+        tabs.setAttribute('role', 'tablist');
+        tabs.setAttribute('aria-label', group.label || groupKey);
+
+        group.slices.forEach(slice => {
+          const button = document.createElement('button');
+          button.className = 'tab-button';
+          button.type = 'button';
+          button.role = 'tab';
+          button.textContent = sliceTabLabel(slice);
+          button.dataset.groupKey = groupKey;
+          button.dataset.sliceKey = slice.key;
+          button.addEventListener('click', () => {
+            state.groupKey = groupKey;
+            state.sliceKey = slice.key;
+            updateTabs();
+            renderRows();
+          });
+          tabs.appendChild(button);
+        });
+
+        block.appendChild(label);
+        block.appendChild(tabs);
+        tabsWrap.appendChild(block);
+      });
+    }
+
+    function updateTabs() {
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        const active = btn.dataset.groupKey === state.groupKey && btn.dataset.sliceKey === state.sliceKey;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    function renderRows() {
+      const activeSlice = getActiveSlice();
+      if (!activeSlice) return;
+
+      const query = state.searchText.trim().toLowerCase();
+      const allRows = rowsFromValues(activeSlice.values);
+      const rows = query
+        ? allRows.filter(row => row.name.toLowerCase().includes(query) || String(row.key || '').toLowerCase().includes(query))
+        : allRows;
+
+      document.getElementById('sliceTitle').textContent = `${getActiveGroup().label || state.groupKey} / ${activeSlice.label}`;
+
+      body.classList.add('fade-out');
+      window.setTimeout(() => {
+        if (rows.length === 0) {
+          body.innerHTML = '<div class="empty-state">No matched models.</div>';
+          body.classList.remove('fade-out');
+          return;
+        }
+
+        body.innerHTML = rows.map((row, index) => {
+          const rank = allRows.findIndex(item => item.key === row.key) + 1;
+          const displayRank = rank || index + 1;
+          return `
+            <div class="row" style="--row-color: ${safeText(row.color)}; animation-delay: ${index * 34}ms">
+              <div class="rank">${medal(displayRank)}</div>
+              <div class="model" title="${safeText(row.name)}">
+                ${renderModelLogo(row)}
+                <div class="model-name">${safeText(row.name)}</div>
+              </div>
+              <div class="bar-track" aria-label="${safeText(row.name)} correctness score ${row.score}">
+                <div class="bar" data-width="${Math.max(0, Math.min(100, row.score * 100))}"></div>
+              </div>
+              <div class="score">${row.score.toFixed(2)}</div>
+            </div>
+          `;
+        }).join('');
+
+        body.classList.remove('fade-out');
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.bar').forEach(el => {
+            el.style.width = `${el.dataset.width}%`;
+          });
+        });
+      }, 150);
+    }
+
+    function showError(err) {
+      console.error(err);
+      body.innerHTML = '<div class="empty-state">Failed to load leaderboard data.</div>';
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = `${err.message} 请确认文件存在：../docs/data/skill-tree.json，并在仓库根目录通过 HTTP 服务访问 leaderboard/index.html。不要直接双击打开。`;
+    }
+
+    async function init() {
+      try {
+        appData = await loadData();
+        validateData(appData);
+
+        models = appData.models;
+        sliceGroups = appData.sliceGroups;
+        initPageMeta(appData);
+        renderOverallLeader();
+
+        const firstGroupKey = getOrderedGroupKeys()[0];
+        state.groupKey = firstGroupKey;
+        state.sliceKey = sliceGroups[firstGroupKey].slices[0].key;
+
+        renderTabs();
+        updateTabs();
+        renderRows();
+      } catch (err) {
+        showError(err);
+      }
+    }
+
+    searchInput.addEventListener('input', event => {
+      state.searchText = event.target.value;
+      renderRows();
+    });
+
+    init();
+  </script>
+</body>
+</html>

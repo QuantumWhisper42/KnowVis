@@ -9,6 +9,10 @@ The dataset jsonl supplies ``category`` and ``labels``. Each ``--judged``
 argument is ``<model-key-or-name>=<judged-jsonl>``. Users may pass any subset
 of models or register new models on the fly, and optionally ``--merge`` scores
 into an existing ``docs/data/skill-tree.json``.
+
+That JSON is the file GitHub Pages serves for the homepage leaderboard and
+for the "Download results JSON" link. This script overwrites only that file.
+It does not write ``docs/index.html``.
 """
 
 from __future__ import annotations

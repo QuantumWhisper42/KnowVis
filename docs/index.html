@@ -1,766 +1,225 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KnowVis Benchmark Leaderboard</title>
-  <meta name="description" content="Case-level correctness results for world-knowledge visual generation models on the KnowVis Skill-Tree Benchmark." />
-
-  <style>
-    :root {
-      --bg: #f6f8fb;
-      --card: rgba(255, 255, 255, 0.92);
-      --surface: rgba(255, 255, 255, 0.72);
-      --surface-muted: rgba(255, 255, 255, 0.62);
-      --text: #172033;
-      --text-soft: #627083;
-      --muted: #7b8797;
-      --label: #9aa4b2;
-      --line: rgba(23, 32, 51, 0.09);
-      --line-soft: rgba(23, 32, 51, 0.055);
-      --track: #edf1f6;
-      --primary: #082845;
-      --primary-2: #103c62;
-      --primary-tint: rgba(8, 40, 69, 0.05);
-      --danger: #b42318;
-      --shadow-sm: 0 12px 34px rgba(15, 35, 62, 0.05);
-      --shadow-md: 0 18px 42px rgba(18, 39, 70, 0.08);
-      --shadow: 0 24px 60px rgba(13, 31, 58, 0.10);
-      --shadow-tab-active: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 10px 24px rgba(8, 40, 69, 0.22);
-      --radius: 22px;
-      --radius-sm: 18px;
-      --radius-pill: 999px;
-      --tracking-tight: -0.04em;
-      --tracking-caps: 0.14em;
-      --focus-ring: 0 0 0 4px rgba(8, 40, 69, 0.06);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background:
-        radial-gradient(circle at 10% 0%, rgba(218, 230, 244, 0.90), transparent 36%),
-        radial-gradient(circle at 80% 10%, rgba(233, 238, 246, 0.95), transparent 34%),
-        linear-gradient(180deg, #fbfcfe 0%, var(--bg) 100%);
-    }
-
-    .page {
-      width: min(1180px, calc(100vw - 40px));
-      margin: 0 auto;
-      padding: 52px 0 72px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(260px, 34%);
-      gap: 28px;
-      align-items: start;
-      margin-bottom: 28px;
-    }
-
-    .eyebrow {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(32px, 4.4vw, 58px);
-      line-height: 1.02;
-      letter-spacing: var(--tracking-tight);
-    }
-
-    .subtitle {
-      max-width: 780px;
-      margin: 16px 0 0;
-      color: var(--text-soft);
-      font-size: 16px;
-      line-height: 1.75;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .summary-card {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-width: 0;
-      padding: 16px 18px 18px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .summary-card span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-    }
-
-    .summary-card strong {
-      font-size: clamp(18px, 2.2vw, 26px);
-      line-height: 1.2;
-      letter-spacing: var(--tracking-tight);
-      word-break: break-word;
-    }
-
-    .leaderboard-section {
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: calc(var(--radius) + 8px);
-      background: var(--surface-muted);
-      box-shadow: var(--shadow);
-    }
-
-    .tabs-wrap {
-      display: grid;
-      gap: 18px;
-      margin-bottom: 22px;
-    }
-
-    .tab-group-label {
-      margin: 0 0 9px;
-      color: var(--label);
-      padding: 8px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-    }
-
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      padding: 8px;
-      border: 1px solid var(--line);
-      border-radius: calc(var(--radius) + 2px);
-      background: var(--surface-muted);
-    }
-
-    .tab-button {
-      min-height: 38px;
-      padding: 0 14px;
-      border: 0;
-      border-radius: var(--radius-pill);
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 800;
-      white-space: nowrap;
-      transition: color 220ms ease, transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
-    }
-
-    .tab-button:hover {
-      transform: translateY(-1px);
-      color: var(--text);
-      background: var(--primary-tint);
-    }
-
-    .tab-button.active {
-      color: #fff;
-      background: linear-gradient(180deg, var(--primary-2), var(--primary));
-      box-shadow: var(--shadow-tab-active);
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      align-items: center;
-      margin: 0 0 14px;
-      flex-wrap: wrap;
-    }
-
-    .slice-title {
-      margin: 0;
-      padding: 8px;
-      font-size: 16px;
-      font-weight: 900;
-    }
-
-    .search-box {
-      width: min(280px, 100%);
-      height: 38px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-pill);
-      padding: 0 14px;
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
-      font: inherit;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .search-box:focus {
-      border-color: rgba(8, 40, 69, 0.28);
-      box-shadow: var(--focus-ring);
-    }
-
-    .table-card {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: var(--shadow-md);
-    }
-
-    .table-head,
-    .row {
-      display: grid;
-      grid-template-columns: 40px minmax(220px, 1.15fr) minmax(320px, 2.4fr) 92px;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .table-head {
-      min-height: 58px;
-      padding: 0 22px;
-      color: var(--label);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: var(--tracking-caps);
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--surface) 60%, transparent));
-    }
-
-    .table-head > div:last-child {
-      text-align: right;
-    }
-
-    .leaderboard-body {
-      min-height: 560px;
-      position: relative;
-    }
-
-    .leaderboard-body.fade-out .row {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-
-    .row {
-      min-height: 72px;
-      padding: 0 22px;
-      border-bottom: 1px solid var(--line-soft);
-      transition: opacity 240ms ease, transform 240ms ease, background 180ms ease;
-      opacity: 1;
-      animation: rowIn 420ms both cubic-bezier(.22,.61,.36,1);
-    }
-
-    .row:hover { background: var(--surface-muted); }
-    .row:last-child { border-bottom: 0; }
-
-    @keyframes rowIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .rank {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .medal { font-size: 17px; }
-
-    .model {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 0;
-    }
-
-    .logo {
-      display: grid;
-      place-items: center;
-      flex: 0 0 32px;
-      width: 32px;
-      height: 32px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: #fff;
-    }
-
-    .logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 4px;
-    }
-
-    .logo-emoji {
-      font-size: 17px;
-      line-height: 1;
-    }
-
-    .model-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      font-size: 14px;
-      font-weight: 850;
-    }
-
-    .bar-track {
-      position: relative;
-      height: 13px;
-      overflow: hidden;
-      border-radius: var(--radius-pill);
-      background: var(--track);
-      box-shadow: inset 0 1px 2px rgba(10, 31, 58, 0.05);
-    }
-
-    .bar {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 0;
-      border-radius: var(--radius-pill);
-      background: linear-gradient(90deg, var(--row-color), color-mix(in srgb, var(--row-color) 76%, #ffffff));
-      transition: width 780ms cubic-bezier(.22,.61,.36,1);
-    }
-
-    .score {
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 900;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .footer-note,
-    .error-message {
-      padding: 8px;
-      margin: 18px 4px 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .footer-note ul {
-      margin: 10px 0 0;
-      padding-left: 1.2em;
-    }
-
-    .footer-note li + li {
-      margin-top: 4px;
-    }
-
-    .error-message {
-      display: none;
-      color: var(--danger);
-      font-weight: 800;
-    }
-
-    .empty-state {
-      display: grid;
-      place-items: center;
-      min-height: 260px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    @media (max-width: 860px) {
-      .page { width: min(100vw - 24px, 760px); padding-top: 34px; }
-      .hero { grid-template-columns: 1fr; }
-
-      .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        flex-wrap: nowrap;
-        gap: 10px;
-      }
-
-      .search-box {
-        width: 100%;
-      }
-
-      .table-head { display: none; }
-      .leaderboard-body { min-height: 0; }
-      .row {
-        grid-template-columns: 38px 1fr 70px;
-        grid-template-areas:
-          "rank model score"
-          "rank bar bar";
-        gap: 9px 12px;
-        min-height: 92px;
-        padding: 14px 14px;
-      }
-      .rank { grid-area: rank; }
-      .model { grid-area: model; }
-      .bar-track { grid-area: bar; }
-      .score { grid-area: score; }
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8fb">
+  <meta name="description" content="KnowVis: dual-view evaluation and diagnosis of world-knowledge grounding in text-to-image models. NeurIPS 2026, KlingAI Research.">
+  <meta property="og:title" content="KnowVis — World knowledge, made visible">
+  <meta property="og:description" content="2,172 knowledge-intensive prompts. Two complementary benchmark views. A structured, validated evaluation protocol.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/prompt-examples.webp">
+  <title>KnowVis · World-Knowledge Grounding in T2I Models</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="showcase.css">
+  <link rel="stylesheet" href="diagrams.css">
+  <script src="data.js" defer></script>
+  <script src="script.js" defer></script>
+  <script src="showcase.js" defer></script>
+  <script src="brand.js" defer></script>
+  <script src="diagrams.js" defer></script>
 </head>
-<body>
-  <main class="page">
-    <section class="hero">
-      <div>
-        <p class="eyebrow" id="eyebrow"></p>
-        <h1 id="pageTitle"></h1>
-        <p class="subtitle" id="pageSubtitle"></p>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="wordmark" href="#top" aria-label="KnowVis home">KnowVis</a>
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-nav"><span></span><span></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+        <a href="#benchmark">Benchmark</a><a href="#protocol">Protocol</a><a href="#reliability">Validation</a><a href="#leaderboard">Leaderboard</a><a href="#resources">Resources</a>
+      </nav>
+      <!-- TODO(arXiv): restore paper link once the arXiv page is live.
+      <a class="nav-paper" href="assets/KnowVis_cameraready.pdf" target="_blank" rel="noopener">Read paper <span aria-hidden="true">↗</span></a>
+      -->
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero section-shell" aria-labelledby="paper-title">
+      <div class="hero-copy reveal">
+        <p class="eyebrow"><span class="status-dot"></span> NeurIPS 2026 · Evaluations &amp; Datasets</p>
+        <h1 id="paper-title"><span class="title-brand" id="livingBrand"><span class="brand-ink">Know<span class="vis-ink">Vis</span></span><canvas class="brand-spectrum" aria-hidden="true"></canvas></span><span class="title-subject">Dual-View Evaluation and Diagnosis of World-Knowledge Grounding in Text-to-Image Models</span></h1>
+        <p class="hero-lede">From a convincing picture to verifiable knowledge.<br>Find what is wrong, where it fails, and what to evaluate next.</p>
+        <p class="authors">Yonghang Yu<sup>*</sup>, Ruoyu Wang<sup>*</sup>, Haoyu Zhang,<br class="desktop-break"> Lin Qi, Yawei Zhou, Changqian Yu</p>
+        <p class="affiliations">KlingAI Research</p>
+        <p class="contribution-note"><sup>*</sup> Equal contribution</p>
+        <div class="hero-actions">
+          <!-- TODO(arXiv): restore paper link once the arXiv page is live.
+          <a class="button" href="assets/KnowVis_cameraready.pdf" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
+          -->
+          <a class="button button-secondary" href="https://github.com/QuantumWhisper42/KnowVis" target="_blank" rel="noopener">Code <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="https://huggingface.co/datasets/QuantumWhisper42/KnowVis" target="_blank" rel="noopener">Dataset <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="#citation">Cite</a>
+        </div>
       </div>
-      <div class="summary-grid" aria-label="overall leader">
-        <div class="summary-card"><span>Overall Leader</span><strong id="overallLeaderName">--</strong></div>
-        <div class="summary-card"><span>Overall Best Score</span><strong id="overallLeaderScore">--</strong></div>
+      <div class="hero-showcase" aria-label="World-knowledge examples">
+        <div class="deck-stage" id="heroDeck"></div>
+        <div class="deck-controls"><span id="deckDomain"></span><div class="deck-dots" id="deckDots" role="group" aria-label="Featured cases"></div><div class="deck-nav"><button class="deck-arrow" id="deckPrev" type="button" aria-label="Previous case">←</button><button class="deck-arrow" id="deckNext" type="button" aria-label="Next case">→</button><button class="deck-pause" id="deckPause" type="button" aria-label="Pause case slideshow">Ⅱ</button></div></div>
       </div>
     </section>
 
-    <section class="leaderboard-section" aria-label="leaderboard">
-      <div class="tabs-wrap" id="tabsWrap"></div>
+    <div class="section-shell"><div class="stat-strip reveal" aria-label="Benchmark at a glance">
+      <div><strong>2,172</strong><span>Core benchmark cases</span></div><div><strong>240</strong><span>Atomic knowledge points</span></div><div><strong>70</strong><span>Generalized knowledge branches</span></div><div><strong>EN / ZH</strong><span>Aligned bilingual prompts</span></div>
+    </div></div>
 
-      <div class="toolbar">
-        <p class="slice-title" id="sliceTitle"></p>
-        <input class="search-box" id="modelSearch" type="search" placeholder="Search model..." autocomplete="off" />
+    <section class="paper-section section-shell" id="motivation">
+      <div class="section-heading reveal"><p class="section-kicker">01 · Motivation</p><h2>When images carry knowledge,<br>the details matter.</h2><p>A scientific diagram, a historical scene, or a public sign can look complete while expressing the wrong fact. KnowVis turns these knowledge constraints into visual evidence that can be checked.</p></div>
+      <div class="motivation-grid reveal">
+        <article><span class="line-icon" aria-hidden="true">01</span><h3>Implicit constraints</h3><p>Prompts rarely spell out every physical law, cultural convention, or domain-specific fact needed to draw the scene correctly.</p></article>
+        <article><span class="line-icon" aria-hidden="true">02</span><h3>Structured expression</h3><p>Objects must connect through the right relations, formulas, arrows, labels, and text–image bindings.</p></article>
+        <article><span class="line-icon" aria-hidden="true">03</span><h3>Reliable judgment</h3><p>Evaluation needs explicit criteria to distinguish a factual error from a valid alternative expression.</p></article>
       </div>
+      <div class="gallery-heading"><h3>Knowledge appears in many visual forms.</h3><p>Explore task examples from the project gallery.</p></div>
+      <div class="example-gallery" id="exampleGallery"></div>
+      <p class="figure-note">Generated examples illustrate the task space; they are not canonical reference answers.</p>
+    </section>
 
-      <div class="table-card">
-        <div class="table-head">
-          <div></div>
-          <div>Model</div>
-          <div>Correctness Score</div>
-          <div>Score</div>
-        </div>
-        <div class="leaderboard-body" id="leaderboardBody" aria-live="polite">
-          <div class="empty-state"></div>
-        </div>
+    <section class="paper-section tinted-section" id="benchmark"><div class="section-shell">
+      <div class="section-heading reveal"><p class="section-kicker">02 · Benchmark design</p><h2>One knowledge map.<br>Two complementary views.</h2><p>Atomic tasks isolate specific knowledge requirements. Open-ended tasks reveal how knowledge is composed and expressed in realistic scenarios.</p></div>
+      <div class="benchmark-pair reveal">
+        <article class="benchmark-panel"><div class="panel-topline"><span class="pill">Skill-Tree</span><span class="panel-index">L4</span></div><h3>Diagnose the building blocks.</h3><div class="large-stat">1,622 <span>cases</span></div><p>240 atomic knowledge points across natural science, formal science, and human civilization &amp; society.</p><ul><li>Knowledge-targeted prompt generation and filtering</li><li>Human checks for ambiguity and evaluability</li><li>Case passes only when every Required VQA passes</li></ul></article>
+        <article class="benchmark-panel generalized"><div class="panel-topline"><span class="pill">Generalized</span><span class="panel-index">L3</span></div><h3>Evaluate knowledge in context.</h3><div class="large-stat">550 <span>cases</span></div><p>20 subjects and 70 branches across five domains, including arts &amp; media and real-time information &amp; events.</p><ul><li>Human-curated, open-ended generation tasks</li><li>235 compositional cases and 126 reasoning cases</li><li>Knowledge scores and human perceptual ratings</li></ul></article>
       </div>
+      <div class="dual-explorer reveal" id="dualExplorer">
+        <div class="explorer-heading"><div><p class="section-kicker">Connected through knowledge</p><h3>From one knowledge point to a complete task.</h3></div><p>Browse related prompts from the two independently constructed benchmarks.</p></div>
+        <div class="pair-tabs" id="pairTabs" role="group" aria-label="Related benchmark tasks"></div>
+        <div class="paired-tasks"><div class="atomic-tasks"><p class="pair-label">Skill-Tree <span>Focused knowledge checks</span></p><div id="atomicPrompts"></div></div><div class="task-connector" aria-hidden="true"><span>Shared<br>knowledge</span><i>↔</i></div><div class="open-task"><p class="pair-label">Generalized <span>Knowledge in context</span></p><div id="generalizedPrompt"></div></div></div>
+        <p class="figure-note">Related tasks share knowledge requirements; Generalized prompts are curated independently, rather than assembled from Skill-Tree prompts.</p>
+      </div>
+      <div class="taxonomy-band reveal"><div><p class="section-kicker">From coverage to diagnosis</p><h3>Give every task<br>a knowledge address.</h3></div><ol class="taxonomy-path"><li><span>L1 · Domain</span><strong>Natural Science</strong></li><li><span>L2 · Subject</span><strong>Physics</strong></li><li><span>L3 · Branch</span><strong>Optics</strong></li><li><span>L4 · Knowledge point</span><strong>Polarization of Light</strong></li></ol></div>
 
-      <p class="error-message" id="errorMessage"></p>
-      <div class="footer-note" id="footerNote"></div>
+<section class="kv-framework" id="frameworkExplorer" aria-labelledby="frameworkTitle">
+  <div class="kv-diagram-heading"><div><p class="kv-overline">From knowledge to evidence</p><h3 id="frameworkTitle">How KnowVis is built.</h3></div><button type="button" class="kv-play" id="frameworkPlay" aria-pressed="true">Pause tour <span aria-hidden="true">Ⅱ</span></button></div>
+  <div class="kv-tour">
+    <div class="kv-steps" role="tablist" aria-label="Explore the KnowVis framework" aria-orientation="vertical">
+      <button class="kv-step" id="frameworkTab0" type="button" role="tab" aria-selected="true" aria-controls="frameworkPanel0" data-step="0"><span class="kv-step-num">01</span><span><strong>Organize knowledge</strong><small>A four-level taxonomy</small></span><i aria-hidden="true"></i></button>
+      <button class="kv-step" id="frameworkTab1" type="button" role="tab" aria-selected="false" aria-controls="frameworkPanel1" tabindex="-1" data-step="1"><span class="kv-step-num">02</span><span><strong>Build two views</strong><small>Atomic and open-ended</small></span><i aria-hidden="true"></i></button>
+      <button class="kv-step" id="frameworkTab2" type="button" role="tab" aria-selected="false" aria-controls="frameworkPanel2" tabindex="-1" data-step="2"><span class="kv-step-num">03</span><span><strong>Check the evidence</strong><small>Structured VQA judgments</small></span><i aria-hidden="true"></i></button>
+      <button class="kv-step" id="frameworkTab3" type="button" role="tab" aria-selected="false" aria-controls="frameworkPanel3" tabindex="-1" data-step="3"><span class="kv-step-num">04</span><span><strong>Validate & diagnose</strong><small>Human labels, localized failures</small></span><i aria-hidden="true"></i></button>
+    </div>
+    <div class="kv-stage">
+      <div class="kv-scene" id="frameworkPanel0" role="tabpanel" aria-labelledby="frameworkTab0" tabindex="0">
+        <p class="kv-scene-label">01 / A shared map of world knowledge</p><h4>Start broad. Make the target testable.</h4>
+        <div class="kv-taxonomy-chain"><div><span>L1 · Domain</span><strong>Natural science</strong></div><b aria-hidden="true">→</b><div><span>L2 · Subject</span><strong>Physics</strong></div><b aria-hidden="true">→</b><div><span>L3 · Branch</span><strong>Mechanics</strong></div><b aria-hidden="true">→</b><div><span>L4 · Atomic point</span><strong>Universal Gravitation</strong></div></div>
+        <div class="kv-path-fork"><div><strong>L3 → Generalized</strong><p>Branches anchor realistic scenarios that may combine several knowledge constraints.</p><span class="kv-inline-stat">70 branches · 550 cases</span></div><div><strong>L4 → Skill-Tree</strong><p>Bounded, independently verifiable points anchor controlled tests.</p><span class="kv-inline-stat">240 atomic points · 1,622 cases</span></div></div>
+        <p class="kv-scene-note">Not every branch needs an L4 node. Subjective or time-sensitive knowledge stays at a stable L2/L3 level.</p>
+      </div>
+      <div class="kv-scene" id="frameworkPanel1" role="tabpanel" aria-labelledby="frameworkTab1" tabindex="0" hidden>
+        <p class="kv-scene-label">02 / Separate construction, shared attribution</p><h4>Keep atomic tests focused. Keep open tasks open.</h4>
+        <div class="kv-construction-lanes"><div><span class="kv-route-tag">Skill-Tree · L4</span><p class="kv-mini-flow">Generate candidates <span>→</span> Filter <span>→</span> Human review</p><div class="kv-edit-example"><span class="kv-edit-label">Too broad</span><p>Draw a fish anatomy diagram and label the gas-exchange organ.</p><span class="kv-edit-arrow" aria-hidden="true">↓</span><span class="kv-edit-label kv-good">Focused revision</span><p>Draw a fish and circle the location of its gills.</p></div><p class="kv-mini-note">One organ–function target, without requiring an entire anatomical system.</p></div><div><span class="kv-route-tag kv-route-open">Generalized · L3</span><p class="kv-mini-flow">Human curation <span>→</span> Annotate involved L4 points</p><div class="kv-open-example"><span class="kv-edit-label">One open prompt</span><p>Draw the moment a child on a playground releases a ball.</p><span class="kv-edit-arrow" aria-hidden="true">↓</span><span class="kv-edit-label kv-good">Human annotation · 3 L4 points in one scene</span><div class="kv-knowledge-links"><span>Gravity</span><span>Release from support</span><span>Spatial relations</span></div></div><p class="kv-mini-note">Multiple constraints remain in context; L4 mappings support partial failure attribution.</p></div></div>
+        <p class="kv-scene-note">Illustrative construction examples adapted from the paper; revisions are suggestions, not measured model outputs.</p>
+      </div>
+      <div class="kv-scene" id="frameworkPanel2" role="tabpanel" aria-labelledby="frameworkTab2" tabindex="0" hidden>
+        <p class="kv-scene-label">03 / Turn knowledge into observable checks</p><h4>A convincing image still has to pass the checks.</h4>
+        <div class="kv-vqa-demo"><div class="kv-gravity-example"><button type="button" class="image-expand" data-lightbox="assets/gravity-evaluated.webp" data-caption="Draw the orbit of the Earth revolving around the Sun, and mark the gravitational force of the Sun on the Earth with an arrow." aria-label="Enlarge the evaluated solar-gravity example"><img src="assets/gravity-evaluated.webp" width="1400" height="1400" alt="Generated Earth-orbit diagram with a force arrow directed toward the Sun"><span class="expand-label">Expand ↗</span></button><p class="kv-gravity-caption"><strong>Earth’s orbit + inward gravity</strong><span>Actual evaluated output</span></p></div><div class="kv-vqa-checks"><div><span class="kv-check-mark">✓</span><span>The luminous sphere has the features of the Sun.<small>Entity identity</small></span><b>PASS</b></div><div><span class="kv-check-mark">✓</span><span>The smaller sphere has the features of Earth.<small>Entity identity</small></span><b>PASS</b></div><div><span class="kv-check-mark">✓</span><span>The force arrow starts at Earth and points toward the Sun’s center.<small>Knowledge relation</small></span><b>PASS</b></div><p>Selected Required checks for the L4 · Universal Gravitation case from step 01, condensed for display. Labels are from the recorded automated evaluation.</p></div></div>
+        <div class="kv-vqa-types"><span><strong>Required</strong>Core correctness</span><span><strong>Optional</strong>Predefined richness</span><span><strong>Additional</strong>New valid expressions; analysis only</span></div><p class="kv-scene-note">Each check carries a component, knowledge hint, and visual grounding when needed. Generalized correctness averages Required outcomes.</p>
+      </div>
+      <div class="kv-scene" id="frameworkPanel3" role="tabpanel" aria-labelledby="frameworkTab3" tabindex="0" hidden>
+        <p class="kv-scene-label">04 / Verify the judge, then locate the failure</p><h4>Human references make automated diagnosis accountable.</h4>
+        <div class="kv-validation-strip"><div><strong>480</strong><span>Skill-Tree images<br>with human reference labels</span></div><div><strong>94.51<small>%</small></strong><span>VQA-level agreement<br>with human labels</span></div><div><strong>88.12<small>%</small></strong><span>Case-level agreement<br>with human labels</span></div></div>
+        <div class="kv-diagnostic-map"><div><span class="kv-route-tag">Atomic test</span><strong>Can it show gravity correctly?</strong></div><span class="kv-diagnostic-join" aria-hidden="true">↔</span><div><span class="kv-route-tag kv-route-open">Open-ended task</span><strong>Can it apply gravity in a scene?</strong></div></div>
+        <div class="kv-diagnostic-readout"><p><b>Atomic ✓ · Open ✓</b><span>Knowledge secured — covered in the atomic test and activated in the open scene.</span></p><p><b>Atomic × · Open ×</b><span>Investigate the underlying knowledge point.</span></p><p><b>Atomic ✓ · Open ×</b><span>Investigate knowledge activation and application.</span></p></div>
+        <p class="kv-scene-note">Diagnostic hypotheses, not proof of a model’s internal knowledge. Generalized evaluation also includes human quality, aesthetics, and satisfaction ratings.</p>
+      </div>
+    </div>
+  </div>
+  <div class="kv-tour-footer"><span id="frameworkStatus">Step 1 of 4 · Auto tour</span><span>Hover the demo or focus to pause · Select a step to explore</span></div>
+</section>
+
+    </div></section>
+
+    <section class="paper-section section-shell" id="protocol">
+      <div class="section-heading reveal"><p class="section-kicker">03 · Evaluation protocol</p><h2>Make the judgment inspectable.</h2><p>Each prompt is decomposed into visual checks. Taxonomy context, knowledge hints, and visual references give the judge concrete evidence for its decisions.</p></div>
+      <div class="protocol-flow reveal"><span>Prompt + image</span><i aria-hidden="true">→</i><span>Structured VQA checklist</span><i aria-hidden="true">→</i><span>PASS / FAIL / NA</span><i aria-hidden="true">→</i><span>Scores + diagnosis</span></div>
+      <div class="inspector reveal" id="caseInspector">
+        <div class="inspector-top"><div><h3>See the knowledge. Inspect the evidence.</h3><p class="figure-note">Selected checks from each case’s complete checklist.</p></div><div class="case-selector"><label for="caseSelect">Explore a case</label><select id="caseSelect"></select></div></div>
+        <div class="inspector-content">
+          <figure class="case-image"><button type="button" class="image-expand" id="caseImageButton"><img id="caseImage" src="assets/case-1.webp" alt="Selected benchmark output" width="1200" height="1200" loading="lazy"><span class="expand-label">Expand ↗</span></button></figure>
+          <div class="case-evidence"><p class="case-category" id="caseCategory"></p><div class="case-prompt-box"><p class="case-prompt" id="casePrompt"></p></div><div class="checklist" id="caseChecks"></div><p class="figure-note" id="caseLabelSource">Selected Required checks · Human annotations</p></div>
+        </div>
+        <div class="inspector-bottom"><span id="casePosition"></span><div><button type="button" id="casePrevious" aria-label="Previous case">←</button><button type="button" id="caseNext" aria-label="Next case">→</button></div></div>
+      </div>
+      <div class="judge-types reveal"><article><span class="type-label">Required</span><h3>Core correctness</h3><p>The minimum evidence that the task's core knowledge is correctly expressed. Skill-Tree uses strict case-level correctness; Generalized also measures partial fulfillment.</p></article><article><span class="type-label teal">Optional</span><h3>Knowledge richness</h3><p>Predefined supplementary expressions measure how much valid, relevant knowledge appears beyond the core requirement.</p></article><article><span class="type-label violet">Additional</span><h3>Discover new expressions</h3><p>Image-derived checks capture supplementary content beyond the current checklist, supporting analysis and future refinement rather than the main richness score.</p></article></div>
+      <div class="dimension-band reveal"><h3>Keep factual correctness and visual appeal distinct.</h3><p>A single score cannot say <em>why</em> an image succeeds. The Xanadu case above fails two Required checks, yet its self-added historical figures pass an Optional richness check — wrong core, genuine extra knowledge. Another image could be factually perfect and still lifeless. Generalized evaluation therefore keeps these questions apart:</p><div class="dimension-grid"><div><strong>Is the knowledge right?</strong><p>Knowledge correctness checks the Required evidence — the porcelain bowl must sit in Kitchenware ∩ Ceramic products. Knowledge richness credits valid extras beyond the core, such as labels naming each painting style. Instruction following covers the non-knowledge brief: five specified items, a Venn layout, the requested language.</p></div><div><strong>Is it well made?</strong><p>Human raters score image quality (resolution, artifacts, readability of text) and aesthetics (composition, color, style coherence) on the same output. A Rococo hall can pass every knowledge check while its cluttered framing still scores poorly here.</p></div><div><strong>Would people take it?</strong><p>Overall satisfaction is an independent, task-dependent judgment: given the prompt's actual purpose, would a person keep this image? It correlates with craft and correctness but is decided by neither alone.</p></div></div><div class="dimension-tags"><span>Knowledge correctness</span><span>Knowledge richness</span><span>Instruction following</span><span>Image quality</span><span>Aesthetics</span><span>Overall satisfaction</span></div></div>
+    </section>
+
+    <section class="paper-section dark-section" id="reliability"><div class="section-shell">
+      <div class="section-heading reveal"><p class="section-kicker">04 · Reliability</p><h2>Evaluate the evaluator.</h2><p>Human-reference checks, controlled ablations, alternative judges, and correction audits test whether the protocol supports dependable comparison.</p></div>
+      <div class="reliability-headline reveal">
+        <div><strong>94.51<span>%</span></strong><h3>VQA-level agreement accuracy</h3><p>Individual checks against human annotations</p></div>
+        <div><strong>88.12<span>%</span></strong><h3>Case-level agreement accuracy</h3><p>Whole-case conclusions against human annotations</p></div>
+      </div>
+      <div class="evaluation-basis reveal"><span class="small-label">Evaluation basis</span><p><strong>480 distinct prompts · 480 images</strong><span>Six T2I source models · Development + validation · Gemini 3.1 Pro Preview</span></p></div>
+      <div class="validation-grid reveal">
+        <article><span class="section-kicker">Human references</span><h3>Agreement before automation</h3><p>Five annotators independently label 288 Required VQAs from 50 Skill-Tree cases.</p><dl><div><dt>Krippendorff’s α</dt><dd>0.766</dd></div><div><dt>Unanimous agreement</dt><dd>82.64%</dd></div></dl></article>
+        <article><span class="section-kicker">Controlled ablation</span><h3>Context improves judgment</h3><p>Removing taxonomy context, knowledge hints, and visual grounding reduces agreement on the same 480 images.</p><dl><div><dt>Full protocol · VQA accuracy</dt><dd>94.51%</dd></div><div><dt>Without all three fields</dt><dd>92.49%</dd></div></dl></article>
+        <article><span class="section-kicker">Open-ended scenarios</span><h3>Check both core and extra knowledge</h3><p>The paper evaluates 100 Generalized cases, with 50 used for the human–judge agreement check.</p><dl><div><dt>Required VQA accuracy</dt><dd>98.41%</dd></div><div><dt>Optional VQA accuracy</dt><dd>98.53%</dd></div></dl></article>
+      </div>
+      <div class="robustness-band reveal"><div><h3>Stable comparative trends<br>across strong judges.</h3><p>A same-setting rerun and two alternative judges retain over 91% VQA-level accuracy. Ranking correlations with the original evaluation remain high.</p><p class="muted-note">Human correction of 50 prompt–image pairs in total across five models yields Spearman’s ρ = 0.9000 within that audited subset.</p></div><div class="table-scroll"><table class="science-table"><caption>VQA agreement and model-ranking consistency</caption><thead><tr><th scope="col">Judge setting</th><th scope="col">Accuracy</th><th scope="col">Spearman’s ρ</th></tr></thead><tbody><tr><th scope="row">Gemini 3.1 Pro Preview · rerun</th><td>91.74%</td><td>0.9273</td></tr><tr><th scope="row">Gemini 3.5 Flash</th><td>92.21%</td><td>0.9394</td></tr><tr><th scope="row">GPT 5.5</th><td>91.33%</td><td>0.9394</td></tr></tbody></table></div></div>
+      <!-- TODO(arXiv): restore paper link once the arXiv page is live.
+      <a class="text-link light-link" href="assets/KnowVis_cameraready.pdf#page=7" target="_blank" rel="noopener">Read the validation experiments <span aria-hidden="true">↗</span></a>
+      -->
+    </div></section>
+
+    <section class="paper-section section-shell" id="findings">
+      <div class="section-heading reveal"><p class="section-kicker">05 · Findings</p><h2>From an overall score<br>to an actionable diagnosis.</h2><p>KnowVis exposes differences between rendering objects, expressing their relations, and grounding the scene in the right knowledge.</p></div>
+      <div class="findings-grid reveal"><article class="finding-copy">
+  <div class="kv-metric-heading"><span class="finding-number">01</span><h3>Relations and annotations are harder than objects.</h3><p class="kv-finding-text">Entity-related checks are generally easier than relational and annotation checks. A model can draw the relevant objects while missing the bindings that make the knowledge correct.</p><p>VQA component pass rates · 10-model average · Skill-Tree Required checks</p></div>
+  <div class="kv-metric-legend" aria-label="Component group legend"><span><i style="background:#397f77"></i>Entity &amp; attribute checks</span><span><i style="background:#b3614c"></i>Annotation checks</span></div>
+  <div class="finding-bars"><div><span>Entity</span><i><b style="width:84%"></b></i><strong>0.84</strong></div><div><span>Attribute binding</span><i><b style="width:70%"></b></i><strong>0.70</strong></div><div><span>Entity relation</span><i><b style="width:64%"></b></i><strong>0.64</strong></div><div><span>Entity trait</span><i><b style="width:61%"></b></i><strong>0.61</strong></div><div class="is-annotation"><span>Annotation</span><i><b style="width:42%"></b></i><strong>0.42</strong></div><div class="is-annotation"><span>Annotation binding</span><i><b style="width:35%"></b></i><strong>0.35</strong></div><div class="is-annotation"><span>Annotation relation</span><i><b style="width:31%"></b></i><strong>0.31</strong></div></div>
+  <p class="kv-chart-readout">The three annotation checks trail every entity and attribute check by 0.19 or more.</p>
+</article>
+<figure class="kv-metric-chart" id="metricComparison" aria-labelledby="metricTitle">
+  <div class="kv-metric-heading"><span class="finding-number">02</span><h3 id="metricTitle">Generic alignment does not capture every knowledge constraint.</h3><p class="kv-finding-text">CLIPScore flattens every subject toward one low score and VQAScore inflates unevenly; the KnowVis judge shadows the human GT profile across all 12 L2 subjects.</p><p>Per-subject score profile · 12 L2 Skill-Tree subjects · 0–1</p></div>
+  <div class="kv-metric-legend" id="metricLegend" aria-label="Metric legend"><span data-series="gt"><i style="background:#082845"></i>Human GT</span><span data-series="knowvis"><i style="background:#397f77"></i>KnowVis</span><span data-series="vqascore"><i style="background:#7c94af"></i>VQAScore</span><span data-series="clipscore"><i style="background:#c2cbd7"></i>CLIPScore</span></div>
+  <div class="kv-chart-plot" id="metricPlot"></div>
+  <p class="kv-chart-readout" id="metricReadout" aria-live="polite">Across all 12 subjects, the KnowVis profile stays closest to the human GT profile.</p>
+  
+</figure>
+</div>
+      <article class="rewrite-panel reveal">
+        <div class="rewrite-intro"><p class="section-kicker">Diagnostic intervention</p><h3>What changes when the facts are explicit?</h3><p>On 240 unseen validation cases, rewriting prompts as direct visual instructions improves case pass rate.</p></div>
+        <div class="rewrite-results"><div><span>Original prompts</span><strong>27.1<small>%</small></strong></div><i aria-hidden="true">→</i><div><span>Explicit factual guidance</span><strong>40.8<small>%</small></strong></div><p>+13.7 percentage points</p></div>
+        <div class="rewrite-example"><div class="rewrite-example-heading"><h4>From an implicit requirement to visual guidance</h4><div id="rewriteTabs" role="group" aria-label="Prompt expansion examples"></div></div><div class="rewrite-comparison"><div><span class="small-label">Original prompt</span><p id="originalPrompt"></p></div><div><span class="small-label">Explicit visual guidance</span><p id="expandedPrompt"></p></div></div><div class="rewrite-adds" id="rewriteAdds"></div><p class="figure-note" id="rewriteSource"></p></div>
+        <p class="rewrite-caveat">Rewriting also changes instruction-following demands. This intervention probes where factual guidance helps; it does not isolate knowledge recall from visual execution.</p>
+      </article>
+    </section>
+
+    <section class="paper-section tinted-section" id="leaderboard"><div class="section-shell">
+      <div class="section-heading reveal"><p class="section-kicker">06 · Explore the results</p><h2>A closer look at model capability.</h2><p>Explore case-level correctness by knowledge domain, subject, education level, and operation. Every score uses the same 240-case Skill-Tree validation split and default judge.</p></div>
+      <div class="leaderboard-section reveal">
+        <div class="leaderboard-top"><div><span class="small-label">Skill-Tree · Case-level correctness</span><h3 id="sliceTitle">Overall</h3></div><div class="scope-control"><label for="modelScope">Model collection</label><select id="modelScope"><option value="all">All 15 released models</option><option value="paper">10 paper models</option></select></div></div>
+        <div class="leaderboard-controls"><div class="group-tabs segmented" id="groupTabs" role="group" aria-label="Evaluation slice group"></div><label class="search-label"><span class="sr-only">Search models</span><input id="modelSearch" type="search" placeholder="Search models…" autocomplete="off"></label></div>
+        <div class="slice-tabs" id="sliceTabs" role="group" aria-label="Evaluation slice"></div>
+        <p class="board-context" id="boardContext">The public release extends the paper's ten-model evaluation with five additional models.</p>
+        <div class="ranking-table" role="table" aria-label="Model correctness ranking"><div class="ranking-head" role="row"><span role="columnheader">Rank</span><span role="columnheader">Model</span><span role="columnheader">Case-level correctness</span><span role="columnheader">Score</span></div><div id="leaderboardBody" role="rowgroup" aria-live="polite"></div></div>
+        <div class="board-footer"><p>Judge: Gemini 3.1 Pro Preview · Score range: 0–1 · Higher is better.</p><a href="data/skill-tree.json" download>Download results JSON <span aria-hidden="true">↓</span></a></div>
+      </div>
+    </div></section>
+
+    <section class="paper-section section-shell" id="resources">
+      <div class="section-heading reveal"><p class="section-kicker">07 · Open resources</p><h2>Run the benchmark.<br>Build the next knowledge task.</h2><p>Start with released prompts and checklists, evaluate your generated images, or extend the taxonomy into new knowledge domains.</p></div>
+      <div class="resource-grid reveal">
+        <a class="resource-card" href="https://github.com/QuantumWhisper42/KnowVis" target="_blank" rel="noopener"><span class="resource-icon" aria-hidden="true">↗</span><h3>Code</h3><p>Load the dataset, create and filter prompts, build VQA checklists, inspect images, run judges, and analyze model behavior.</p><span>Explore on GitHub ↗</span></a>
+        <a class="resource-card" href="https://huggingface.co/datasets/QuantumWhisper42/KnowVis" target="_blank" rel="noopener"><span class="resource-icon" aria-hidden="true">↗</span><h3>Dataset</h3><p>2,172 core cases + 100 general-domain control tasks, sampled from a 600-task pool to separate knowledge grounding from general T2I ability. Bilingual prompts, structured checklists, metadata, human labels, and evaluation images.</p><span>Explore on Hugging Face ↗</span></a>
+      </div>
+      <div class="quickstart reveal"><div><h3>Start with the included examples.</h3><p>The repository's example workflow provides a compact entry point before running the full dataset.</p><a class="text-link" href="https://github.com/QuantumWhisper42/KnowVis#readme" target="_blank" rel="noopener">Full setup and evaluation guide ↗</a></div><div class="code-card"><div class="code-topline"><span>Get the code</span><button type="button" class="copy-button" data-copy="quickstartCode">Copy</button></div><pre id="quickstartCode"><code>git clone https://github.com/QuantumWhisper42/KnowVis.git
+cd KnowVis
+uv sync</code></pre></div></div>
+      <div class="citation-block reveal" id="citation"><div class="citation-heading"><h3>Citation</h3><button class="copy-button" type="button" data-copy="citationCode">Copy BibTeX</button></div><pre id="citationCode"><code>@inproceedings{knowvis2026,
+  title = {KnowVis: Dual-View Evaluation and Diagnosis of
+           World-Knowledge Grounding in Text-to-Image Models},
+  author = {Yu, Yonghang and Wang, Ruoyu and Zhang, Haoyu and
+            Qi, Lin and Zhou, Yawei and Yu, Changqian},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year = {2026},
+  url = {https://neurips.cc/virtual/2026/poster/139323}
+}</code></pre></div>
     </section>
   </main>
-
-  <script>
-    const DATA_URL = './data/skill-tree.json';
-
-    const DEFAULT_COLORS = [
-      '#9acb76', '#75b5a9', '#e8d87d', '#5fa1d7', '#a4c884',
-      '#79b887', '#93c4a0', '#72a8c2', '#94c26e', '#d8ca84',
-      '#e2aa92', '#a8a6df', '#d7b3dd', '#87c7e0', '#b8c5d6'
-    ];
-
-    let appData = null;
-    let models = [];
-    let sliceGroups = {};
-    let state = {
-      groupKey: null,
-      sliceKey: null,
-      searchText: ''
-    };
-
-    const tabsWrap = document.getElementById('tabsWrap');
-    const body = document.getElementById('leaderboardBody');
-    const searchInput = document.getElementById('modelSearch');
-    const errorMessage = document.getElementById('errorMessage');
-
-    async function loadData() {
-      const response = await fetch(DATA_URL, { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error(`Failed to load ${DATA_URL}. HTTP status: ${response.status}`);
-      }
-      return response.json();
-    }
-
-    function validateData(data) {
-      if (!data || !Array.isArray(data.models) || data.models.length === 0) {
-        throw new Error('skill-tree.json 缺少 models 数组，或 models 为空。');
-      }
-      if (!data.sliceGroups || typeof data.sliceGroups !== 'object') {
-        throw new Error('skill-tree.json 缺少 sliceGroups 对象。');
-      }
-
-      const modelCount = data.models.length;
-      Object.entries(data.sliceGroups).forEach(([groupKey, group]) => {
-        if (!Array.isArray(group.slices)) {
-          throw new Error(`sliceGroups.${groupKey}.slices 必须是数组。`);
-        }
-        group.slices.forEach(slice => {
-          if (!slice.label) {
-            throw new Error(`Slice「${slice.key}」缺少 label 字段。`);
-          }
-          if (!Array.isArray(slice.values) || slice.values.length !== modelCount) {
-            throw new Error(`Slice「${slice.label}」的 values 长度必须与 models 数量一致。`);
-          }
-        });
-      });
-    }
-
-    function sliceTabLabel(slice) {
-      return slice.emoji ? `${slice.emoji} ${slice.label}` : slice.label;
-    }
-
-    function initPageMeta(data) {
-      const meta = data.meta || {};
-
-      if (meta.title) {
-        document.title = meta.title;
-        document.getElementById('pageTitle').textContent = meta.title;
-      }
-      if (meta.eyebrow) {
-        document.getElementById('eyebrow').textContent = meta.eyebrow;
-      }
-      if (meta.subtitle) {
-        document.getElementById('pageSubtitle').innerHTML = meta.subtitle;
-      }
-      if (meta.description) {
-        document.querySelector('meta[name="description"]').setAttribute('content', meta.description);
-      }
-      renderFooterNote(data);
-    }
-
-    function renderFooterNote(data) {
-      const meta = data.meta || {};
-      const parts = [];
-      if (meta.footerNote) parts.push(meta.footerNote);
-
-      const stats = [];
-      if (models.length) stats.push(`Evaluated models: ${models.length}`);
-      if (meta.scoreRange) stats.push(`Score range: ${meta.scoreRange}`);
-      if (stats.length) {
-        const items = stats.map(item => `<li>${safeText(item)}</li>`).join('');
-        parts.push(`<ul>${items}</ul>`);
-      }
-
-      document.getElementById('footerNote').innerHTML = parts.join('');
-    }
-
-    function getOverallSlice() {
-      for (const group of Object.values(sliceGroups)) {
-        const slice = group.slices?.find(item => item.key === 'all');
-        if (slice) return slice;
-      }
-      return null;
-    }
-
-    function renderOverallLeader() {
-      const slice = getOverallSlice();
-      const leader = slice ? rowsFromValues(slice.values)[0] : null;
-      const nameEl = document.getElementById('overallLeaderName');
-      const scoreEl = document.getElementById('overallLeaderScore');
-
-      if (!leader) {
-        nameEl.textContent = '--';
-        nameEl.title = '';
-        scoreEl.textContent = '--';
-        return;
-      }
-
-      nameEl.textContent = `🏆 ${leader.name}`;
-      nameEl.title = leader.name;
-      scoreEl.textContent = `📊 ${leader.score.toFixed(2)}`;
-    }
-
-    function getOrderedGroupKeys() {
-      return Object.entries(sliceGroups)
-        .sort((a, b) => (a[1].order ?? 999) - (b[1].order ?? 999))
-        .map(([key]) => key);
-    }
-
-    function getActiveGroup() {
-      return sliceGroups[state.groupKey];
-    }
-
-    function getActiveSlice() {
-      const group = getActiveGroup();
-      if (!group) return null;
-      return group.slices.find(item => item.key === state.sliceKey) || group.slices[0];
-    }
-
-    function rowsFromValues(values) {
-      return models.map((model, i) => ({
-        ...model,
-        score: Number(values[i]),
-        color: model.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length]
-      })).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
-    }
-
-    function medal(rank) {
-      if (rank === 1) return '<span class="medal">🥇</span>';
-      if (rank === 2) return '<span class="medal">🥈</span>';
-      if (rank === 3) return '<span class="medal">🥉</span>';
-      return rank;
-    }
-
-    function safeText(value) {
-      return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function renderModelLogo(row) {
-      if (row.logoEmoji) {
-        return `<div class="logo logo-emoji" aria-hidden="true">${safeText(row.logoEmoji)}</div>`;
-      }
-      if (row.logo) {
-        const src = encodeURI(row.logo);
-        return `<div class="logo"><img src="${safeText(src)}" alt="" loading="lazy" decoding="async" /></div>`;
-      }
-      return `<div class="logo logo-emoji">${safeText(row.name.slice(0, 2).toUpperCase())}</div>`;
-    }
-
-    function renderTabs() {
-      tabsWrap.innerHTML = '';
-
-      getOrderedGroupKeys().forEach(groupKey => {
-        const group = sliceGroups[groupKey];
-        const block = document.createElement('div');
-        const label = document.createElement('p');
-        const tabs = document.createElement('div');
-
-        label.className = 'tab-group-label';
-        label.textContent = group.label || groupKey;
-        tabs.className = 'tabs';
-        tabs.setAttribute('role', 'tablist');
-        tabs.setAttribute('aria-label', group.label || groupKey);
-
-        group.slices.forEach(slice => {
-          const button = document.createElement('button');
-          button.className = 'tab-button';
-          button.type = 'button';
-          button.role = 'tab';
-          button.textContent = sliceTabLabel(slice);
-          button.dataset.groupKey = groupKey;
-          button.dataset.sliceKey = slice.key;
-          button.addEventListener('click', () => {
-            state.groupKey = groupKey;
-            state.sliceKey = slice.key;
-            updateTabs();
-            renderRows();
-          });
-          tabs.appendChild(button);
-        });
-
-        block.appendChild(label);
-        block.appendChild(tabs);
-        tabsWrap.appendChild(block);
-      });
-    }
-
-    function updateTabs() {
-      document.querySelectorAll('.tab-button').forEach(btn => {
-        const active = btn.dataset.groupKey === state.groupKey && btn.dataset.sliceKey === state.sliceKey;
-        btn.classList.toggle('active', active);
-        btn.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-    }
-
-    function renderRows() {
-      const activeSlice = getActiveSlice();
-      if (!activeSlice) return;
-
-      const query = state.searchText.trim().toLowerCase();
-      const allRows = rowsFromValues(activeSlice.values);
-      const rows = query
-        ? allRows.filter(row => row.name.toLowerCase().includes(query) || String(row.key || '').toLowerCase().includes(query))
-        : allRows;
-
-      document.getElementById('sliceTitle').textContent = `${getActiveGroup().label || state.groupKey} / ${activeSlice.label}`;
-
-      body.classList.add('fade-out');
-      window.setTimeout(() => {
-        if (rows.length === 0) {
-          body.innerHTML = '<div class="empty-state">No matched models.</div>';
-          body.classList.remove('fade-out');
-          return;
-        }
-
-        body.innerHTML = rows.map((row, index) => {
-          const rank = allRows.findIndex(item => item.key === row.key) + 1;
-          const displayRank = rank || index + 1;
-          return `
-            <div class="row" style="--row-color: ${safeText(row.color)}; animation-delay: ${index * 34}ms">
-              <div class="rank">${medal(displayRank)}</div>
-              <div class="model" title="${safeText(row.name)}">
-                ${renderModelLogo(row)}
-                <div class="model-name">${safeText(row.name)}</div>
-              </div>
-              <div class="bar-track" aria-label="${safeText(row.name)} correctness score ${row.score}">
-                <div class="bar" data-width="${Math.max(0, Math.min(100, row.score * 100))}"></div>
-              </div>
-              <div class="score">${row.score.toFixed(2)}</div>
-            </div>
-          `;
-        }).join('');
-
-        body.classList.remove('fade-out');
-        requestAnimationFrame(() => {
-          document.querySelectorAll('.bar').forEach(el => {
-            el.style.width = `${el.dataset.width}%`;
-          });
-        });
-      }, 150);
-    }
-
-    function showError(err) {
-      console.error(err);
-      body.innerHTML = '<div class="empty-state">Failed to load leaderboard data.</div>';
-      errorMessage.style.display = 'block';
-      errorMessage.textContent = `${err.message} 请确认文件存在：data/skill-tree.json，并通过 HTTP 服务访问页面。不要直接双击打开 index.html。`;
-    }
-
-    async function init() {
-      try {
-        appData = await loadData();
-        validateData(appData);
-
-        models = appData.models;
-        sliceGroups = appData.sliceGroups;
-        initPageMeta(appData);
-        renderOverallLeader();
-
-        const firstGroupKey = getOrderedGroupKeys()[0];
-        state.groupKey = firstGroupKey;
-        state.sliceKey = sliceGroups[firstGroupKey].slices[0].key;
-
-        renderTabs();
-        updateTabs();
-        renderRows();
-      } catch (err) {
-        showError(err);
-      }
-    }
-
-    searchInput.addEventListener('input', event => {
-      state.searchText = event.target.value;
-      renderRows();
-    });
-
-    init();
-  </script>
+  <footer class="site-footer section-shell"><a class="wordmark" href="#top">KnowVis</a><p class="footer-center">KlingAI Research · NeurIPS 2026 Evaluations &amp; Datasets</p><div><a href="#top">Back to top ↑</a></div></footer>
+  <dialog class="lightbox" id="lightbox"><button class="lightbox-close" type="button" aria-label="Close enlarged image">×</button><img id="lightboxImage" alt=""><p id="lightboxCaption"></p></dialog>
+  <p class="sr-only" id="copyStatus" aria-live="polite"></p>
 </body>
 </html>

@@ -27,7 +27,7 @@ NeurIPS 2026 · Evaluations & Datasets Track
 <br/>
 
 <div align="center">
-  <img src="docs/assets/prompt-examples.png" alt="prompt-examples" width="100%">
+  <img src="assets/readme/prompt-examples.png" alt="prompt-examples" width="100%">
 </div>
 
 <br/>
@@ -47,18 +47,20 @@ NeurIPS 2026 · Evaluations & Datasets Track
 | **通用领域控制子集** (`common`) | 100 | 100（取自 600 条通用评测池） | 常见实体与场景生成 |
 
 <div align="center">
-  <img src="docs/assets/key-points.png" alt="key-points" width="100%">
+  <img src="assets/readme/key-points.png" alt="key-points" width="100%">
 </div>
 
 ## 🚀 排行榜
 
 点击下方图片可按知识类目、教育阶段和知识作用方式查看详细排名。排行榜展示的是各模型在 **240 条技能树未见验证集（`val_gt`）** 上的样本级正确率（默认评测模型为 **Gemini 3.1 Pro Preview**）。
 
+- **更新日志（`2026-11-10`）**：GitHub Pages 更换为新的项目主页。页面榜单和结果下载使用同一份 `docs/data/skill-tree.json`。
+- **更新日志（`2026-11-06`）**：仓库更新为 camera-ready 版本。
 - **更新日志（`2026-06-04`）**：在论文评测的 10 个模型（`Nano Banana 2`、`Seedream 5.0 Lite`、`Recraft v4`、`HunyuanImage 3.0`、`Qwen Image 2.0`、`Wan 2.7 Pro`、`FLUX.2 Pro`、`Seedream 4.5`、`Kling Image 3.0 Omni`、`Midjourney v7`）基础上，新增了 5 个扩展评测模型（`Nano Banana Pro`、`GPT-Image-2.0`、`FLUX.2 Dev`、`Qwen Image 2512`、`Seedream 4.0`）。
 
 <div align="center">
   <a href="https://quantumwhisper42.github.io/KnowVis/">
-    <img src="docs/assets/leaderboard.png" alt="leaderboard" width="100%">
+    <img src="assets/readme/leaderboard.png" alt="leaderboard" width="100%">
   </a>
 </div>
 
@@ -80,7 +82,7 @@ python scripts/score_skill_tree.py \
   --output docs/data/skill-tree.json
 ```
 
-每个待对比的模型传一次 `--judged <key_or_name>=<jsonl>` 即可。`kling_image_3_0_omni` 对应 Kling Image 3.0 Omni。
+每个待对比的模型传一次 `--judged <key_or_name>=<jsonl>` 即可。`kling_image_3_0_omni` 对应 Kling Image 3.0 Omni。输出的是主页榜单读取、也是 “Download results JSON” 下载的同一份文件。这条命令只覆盖该 JSON，不会替换 `docs/index.html`。
 
 ## ℹ️ 项目简介
 
@@ -98,7 +100,9 @@ python scripts/score_skill_tree.py \
 ```
 .
 ├── data/template/                      # System Prompt 和 Message 模板
-├── docs/                               # GitHub Pages 排行榜页面与图表资源
+├── assets/readme/                      # 本 README 引用的配图
+├── docs/                               # GitHub Pages 项目主页
+├── leaderboard/                        # 独立排行榜页面，读取 docs/data/skill-tree.json，不作为站点首页发布
 ├── example/                            # 快速上手示例数据与图像
 ├── lib
 │   ├── agents
@@ -362,7 +366,7 @@ s3 =
 ## 🖼 VQA 检查项示例
 
 <div align="center">
-  <img src="docs/assets/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
+  <img src="assets/readme/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
 </div>
 
 

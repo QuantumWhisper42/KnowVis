@@ -27,7 +27,7 @@ NeurIPS 2026 · Evaluations & Datasets Track
 <br/>
 
 <div align="center">
-  <img src="docs/assets/prompt-examples.png" alt="prompt-examples" width="100%">
+  <img src="assets/readme/prompt-examples.png" alt="prompt-examples" width="100%">
 </div>
 
 <br/>
@@ -47,18 +47,20 @@ The protocol uses Required VQAs to assess atomic knowledge correctness in the Sk
 | **General-Domain T2I Control** (`common`) | 100 | 100 (control subset from a 600-case pool) | Common entity and scene generation |
 
 <div align="center">
-  <img src="docs/assets/key-points.png" alt="key-points" width="100%">
+  <img src="assets/readme/key-points.png" alt="key-points" width="100%">
 </div>
 
 ## 🚀 Leaderboard
 
 Click the image to view rankings by category, education level, and knowledge operation type. Leaderboard scores report case-level correctness on the **240-case Skill-Tree unseen validation split (`val_gt`)** evaluated by **Gemini 3.1 Pro Preview**.
 
+- **Changelog (`2026-11-10`)**: Replaced the GitHub Pages site with the new project homepage. The page leaderboard and the results download both use `docs/data/skill-tree.json`.
+- **Changelog (`2026-11-06`)**: Updated the repository to the camera-ready version.
 - **Changelog (`2026-06-04`)**: Expanded the Skill-Tree Leaderboard with 5 additional models (`Nano Banana Pro`, `GPT-Image-2.0`, `FLUX.2 Dev`, `Qwen Image 2512`, and `Seedream 4.0`) alongside the 10 models evaluated in the paper (`Nano Banana 2`, `Seedream 5.0 Lite`, `Recraft v4`, `HunyuanImage 3.0`, `Qwen Image 2.0`, `Wan 2.7 Pro`, `FLUX.2 Pro`, `Seedream 4.5`, `Kling Image 3.0 Omni`, and `Midjourney v7`).
 
 <div align="center">
   <a href="https://quantumwhisper42.github.io/KnowVis/">
-    <img src="docs/assets/leaderboard.png" alt="leaderboard" width="100%">
+    <img src="assets/readme/leaderboard.png" alt="leaderboard" width="100%">
   </a>
 </div>
 
@@ -80,7 +82,7 @@ python scripts/score_skill_tree.py \
   --output docs/data/skill-tree.json
 ```
 
-Pass `--judged <key_or_name>=<jsonl>` once for each model you want to evaluate or compare. `kling_image_3_0_omni` is Kling Image 3.0 Omni.
+Pass `--judged <key_or_name>=<jsonl>` once for each model you want to evaluate or compare. `kling_image_3_0_omni` is Kling Image 3.0 Omni. The output file is the one the homepage leaderboard fetches and the one offered as “Download results JSON”. The command overwrites that JSON only and does not replace `docs/index.html`.
 
 ## ℹ️ Project Overview
 
@@ -98,7 +100,9 @@ Each stage is implemented as a **pydantic-graph** workflow with SQLite-based sta
 ```
 .
 ├── data/template/                      # System prompt and message templates
-├── docs/                               # GitHub Pages leaderboard and figure assets
+├── assets/readme/                      # Figures embedded in this README
+├── docs/                               # GitHub Pages project homepage
+├── leaderboard/                        # Standalone leaderboard page; reads docs/data/skill-tree.json and is not the site root
 ├── example/                            # Quick-start example cases and assets
 ├── lib
 │   ├── agents
@@ -362,7 +366,7 @@ s3 =
 ## 🖼 Examples of VQA Checklists
 
 <div align="center">
-  <img src="docs/assets/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
+  <img src="assets/readme/vqa-checklist-example.png" alt="vqa-checklist-example" width="100%">
 </div>
 
 
